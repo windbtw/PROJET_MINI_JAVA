@@ -9,9 +9,9 @@
 
 
 	<path id="libraries">
-		<files includes="${tools}/java-cup-11b-runtime.jar" />
-		<files includes="${tools}/commons-text-1.2.jar" />
-		<files includes="${tools}/antlr-4.13.1-complete.jar" />
+		<fileset dir="${tools}">
+			<include name="*.jar" />
+		</fileset>
 	</path>
 
 	<target name="generate">
