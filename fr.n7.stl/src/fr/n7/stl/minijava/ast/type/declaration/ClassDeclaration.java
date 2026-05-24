@@ -45,6 +45,10 @@ public class ClassDeclaration implements Instruction, Declaration {
 		return this.objectSize;
 	}
 
+	public SymbolTable getMembers() {
+		return this.members;
+	}
+
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
 		if (!_scope.accepts(this)) {
