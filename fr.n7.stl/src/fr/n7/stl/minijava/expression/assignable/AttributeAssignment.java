@@ -25,6 +25,9 @@ public class AttributeAssignment extends AbstractAttribute<AssignableExpression>
 		} else if (this.object instanceof ThisAssignment) {
 			ThisAssignment ta = (ThisAssignment) this.object;
 			result.add(_factory.createLoad(Register.LB, ta.getDeclaration().getOffset(), 1));
+		} else if (this.object instanceof SuperAssignment) {
+			SuperAssignment sa = (SuperAssignment) this.object;
+			result.add(_factory.createLoad(Register.LB, sa.getThisDeclaration().getOffset(), 1));
 		} else {
 			throw new UnsupportedOperationException(
 				"Attribute assignment on " + this.object.getClass().getSimpleName() + " not supported yet.");

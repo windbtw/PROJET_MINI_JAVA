@@ -12,7 +12,9 @@ import fr.n7.stl.minic.ast.type.Type;
 import fr.n7.stl.minijava.ast.type.ClassType;
 import fr.n7.stl.minijava.ast.type.declaration.ClassDeclaration;
 import fr.n7.stl.minijava.ast.type.declaration.MethodDeclaration;
+import fr.n7.stl.minijava.expression.accessible.SuperAccess;
 import fr.n7.stl.tam.ast.Fragment;
+import fr.n7.stl.tam.ast.Library;
 import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 import fr.n7.stl.util.Logger;
@@ -101,10 +103,23 @@ public class MethodCall implements Instruction {
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
 		result.append(this.target.getCode(_factory));
+		int argsSize = 0;
 		for (AccessibleExpression a : this.arguments) {
 			result.append(a.getCode(_factory));
+			argsSize += a.getType().length();
 		}
-		result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
+		if (this.target instanceof SuperAccess) {
+			result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
+		} else {
+			ClassDeclaration staticClass = ((ClassType) this.target.getType()).getDeclaration();
+			int slot = staticClass.getMethodSlot(this.name);
+			result.add(_factory.createLoad(Register.ST, -(1 + argsSize), 1));
+			result.add(_factory.createLoadI(1));
+			result.add(_factory.createLoadL(slot));
+			result.add(Library.IAdd);
+			result.add(_factory.createLoadI(1));
+			result.add(_factory.createCallI(Register.SB));
+		}
 		// Discard return value when used as an instruction.
 		int returnSize = this.method.getType().length();
 		if (returnSize > 0) {

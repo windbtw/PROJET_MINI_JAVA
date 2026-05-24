@@ -76,6 +76,12 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 		ClassDeclaration cd = this.type.getDeclaration();
 		result.add(_factory.createLoadL(cd.getObjectSize()));
 		result.add(Library.MAlloc);
+		// Initialize obj[0] = vtable pointer (only if the class actually has methods).
+		if (cd.getVtableSize() > 0) {
+			result.add(_factory.createLoad(Register.ST, -1, 1));            // dup obj -> [obj, obj]
+			result.add(_factory.createLoad(Register.SB, cd.getVtableSBOffset(), 1)); // [obj, obj, vtable]
+			result.add(_factory.createStoreI(1));                            // stores vtable at obj[0]; pops both → [obj]
+		}
 		if (this.constructor != null) {
 			// Duplicate the reference: one copy is consumed by the constructor (as `this`),
 			// the other remains as the result of `new`.

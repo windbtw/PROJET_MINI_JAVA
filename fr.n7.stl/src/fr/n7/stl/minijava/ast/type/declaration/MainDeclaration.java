@@ -66,7 +66,8 @@ public class MainDeclaration implements Instruction {
 		for (Declaration d : this.declarations) {
 			size += ((Instruction) d).allocateMemory(Register.SB, _offset + size);
 		}
-		this.main.allocateMemory(Register.LB, 0);
+		// Shift main's local frame past the reserved SB area (vtable slots + globals).
+		this.main.allocateMemory(Register.LB, _offset + size);
 		return size;
 	}
 

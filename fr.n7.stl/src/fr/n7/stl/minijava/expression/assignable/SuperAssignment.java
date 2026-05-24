@@ -8,13 +8,13 @@ import fr.n7.stl.tam.ast.TAMFactory;
 public class SuperAssignment extends AbstractSuper<AssignableExpression> implements AssignableExpression {
 
 	public SuperAssignment() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
-		// TODO Auto-generated method stub
-		return null;
+		// `super = ...` is not meaningful in this subset.
+		throw new UnsupportedOperationException("Assignment to 'super' is not supported.");
 	}
 
 }

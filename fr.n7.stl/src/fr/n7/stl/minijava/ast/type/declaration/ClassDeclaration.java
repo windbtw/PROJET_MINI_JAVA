@@ -1,6 +1,7 @@
 package fr.n7.stl.minijava.ast.type.declaration;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import fr.n7.stl.minic.ast.instruction.Instruction;
@@ -11,6 +12,7 @@ import fr.n7.stl.minic.ast.scope.SymbolTable;
 import fr.n7.stl.minic.ast.type.Type;
 import fr.n7.stl.minijava.ast.type.ClassType;
 import fr.n7.stl.tam.ast.Fragment;
+import fr.n7.stl.tam.ast.Library;
 import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 
@@ -38,6 +40,16 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	/** Guard to make allocateMemory recursion idempotent. */
 	protected boolean memoryAllocated = false;
+
+	/**
+	 * Virtual-method table: ordered map from method name → method.
+	 * Inherits parent's entries first (same slot indices), then own methods
+	 * overwrite or append. Iteration order = slot order.
+	 */
+	protected LinkedHashMap<String, MethodDeclaration> vtable = new LinkedHashMap<>();
+
+	/** SB-relative offset of the slot that holds the heap address of this class's vtable. */
+	protected int vtableSBOffset;
 
 	public ClassDeclaration(boolean _concrete, String _name, String _ancestor, List<ClassElement> _elements) {
 		this.concrete = _concrete;
@@ -84,6 +96,30 @@ public class ClassDeclaration implements Instruction, Declaration {
 			c = c.parent;
 		}
 		return false;
+	}
+
+	public int getVtableSBOffset() {
+		return this.vtableSBOffset;
+	}
+
+	public void setVtableSBOffset(int o) {
+		this.vtableSBOffset = o;
+	}
+
+	public int getVtableSize() {
+		return this.vtable.size();
+	}
+
+	/** Slot index of a method in this class's vtable (-1 if not found). */
+	public int getMethodSlot(String memberName) {
+		int i = 0;
+		for (String k : this.vtable.keySet()) {
+			if (k.equals(memberName)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 
 	/** Find a constructor whose user-arity matches (or null). */
@@ -194,18 +230,24 @@ public class ClassDeclaration implements Instruction, Declaration {
 			return 0;
 		}
 		this.memoryAllocated = true;
-		// Layout: parent attributes first, then own attributes, so the child's
-		// memory image is a superset of the parent's at the same offsets.
-		int current = 0;
+		// Layout: [vtable_ptr] [parent attributes...] [own attributes...]
+		// Slot 0 is reserved for the vtable pointer (used for late binding).
+		int current;
 		if (this.parent != null) {
 			this.parent.allocateMemory(_register, _offset);
 			current = this.parent.getObjectSize();
+			this.vtable.putAll(this.parent.vtable);
+		} else {
+			current = 1; // reserve obj[0] for vtable pointer
 		}
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				AttributeDeclaration a = (AttributeDeclaration) e;
 				a.setOffset(current);
 				current += a.getLength();
+			} else if (e instanceof MethodDeclaration) {
+				// New methods append a slot; same-name methods override the inherited slot.
+				this.vtable.put(e.getName(), (MethodDeclaration) e);
 			}
 		}
 		this.objectSize = current;
@@ -228,6 +270,32 @@ public class ClassDeclaration implements Instruction, Declaration {
 			} else if (e instanceof ConstructorDeclaration) {
 				result.append(((ConstructorDeclaration) e).getCode(_factory));
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * Code that builds this class's vtable on the heap and stores its address in SB[vtableSBOffset].
+	 * Run once at program startup, before main.
+	 */
+	public Fragment getVTableInitCode(TAMFactory _factory) {
+		Fragment result = _factory.createFragment();
+		if (this.vtable.isEmpty()) {
+			return result;
+		}
+		// vtable_addr = MAlloc(vtable.size)
+		result.add(_factory.createLoadL(this.vtable.size()));
+		result.add(Library.MAlloc);
+		result.add(_factory.createStore(Register.SB, this.vtableSBOffset, 1));
+		// For each slot: vtable[slot] = code address of the method bound to that slot.
+		int slot = 0;
+		for (MethodDeclaration m : this.vtable.values()) {
+			result.add(_factory.createLoadA(m.getFunction().getName()));
+			result.add(_factory.createLoad(Register.SB, this.vtableSBOffset, 1));
+			result.add(_factory.createLoadL(slot));
+			result.add(Library.IAdd);
+			result.add(_factory.createStoreI(1));
+			slot++;
 		}
 		return result;
 	}

@@ -130,13 +130,28 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
                     System.out.println("Type verification succeeded.");
 
                     System.out.println("Code generation ...");
+                    // Reserve one SB slot per class to hold the heap address of its vtable.
+                    int sbBase = 0;
+                    for (ClassDeclaration c : this.classes) {
+                        c.setVtableSBOffset(sbBase);
+                        sbBase++;
+                    }
                     for (ClassDeclaration c : this.classes) {
                     	c.allocateMemory(Register.SB, 0);
                     }
-                    this.main.allocateMemory(Register.SB, 0);
+                    // Main globals start above the vtable pointer slots.
+                    this.main.allocateMemory(Register.SB, sbBase);
                     TAMFactory factory = new TAMFactoryImpl();
                     Fragment f = factory.createFragment();
-                    // Main code first (entry point), then class method bodies (reached by CALL).
+                    // Reserve stack slots for vtable pointers so main's globals don't clobber them.
+                    if (sbBase > 0) {
+                        f.add(factory.createPush(sbBase));
+                    }
+                    // Vtable initialization (must run first, before any object can be allocated).
+                    for (ClassDeclaration c : this.classes) {
+                    	f.append(c.getVTableInitCode(factory));
+                    }
+                    // Main entry point. MainDeclaration.getCode emits main body + HALT + nested funcs.
                     f.append(this.main.getCode(factory));
                     for (ClassDeclaration c : this.classes) {
                     	f.append(c.getCode(factory));
