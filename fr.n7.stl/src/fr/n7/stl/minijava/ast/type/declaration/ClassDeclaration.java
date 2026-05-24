@@ -1,5 +1,6 @@
 package fr.n7.stl.minijava.ast.type.declaration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.n7.stl.minic.ast.instruction.Instruction;
@@ -29,6 +30,9 @@ public class ClassDeclaration implements Instruction, Declaration {
 	/** Total size in TAM words of an instance of this class. */
 	protected int objectSize;
 
+	/** Constructors of this class (indexed lookup by arity). */
+	protected List<ConstructorDeclaration> constructors = new ArrayList<>();
+
 	public ClassDeclaration(boolean _concrete, String _name, String _ancestor, List<ClassElement> _elements) {
 		this.concrete = _concrete;
 		this.name = _name;
@@ -47,6 +51,16 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	public SymbolTable getMembers() {
 		return this.members;
+	}
+
+	/** Find a constructor whose user-arity matches (or null). */
+	public ConstructorDeclaration findConstructor(int arity) {
+		for (ConstructorDeclaration c : this.constructors) {
+			if (c.getArity() == arity) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -77,8 +91,20 @@ public class ClassDeclaration implements Instruction, Declaration {
 				}
 				// Method body's local scope: parent = outer scope (so other classes / globals are visible).
 				ok &= m.collectAndPartialResolve(_scope);
+			} else if (e instanceof ConstructorDeclaration) {
+				ConstructorDeclaration c = (ConstructorDeclaration) e;
+				if (!c.getName().equals(this.name)) {
+					System.err.println("Constructor name " + c.getName() + " does not match class " + this.name + ".");
+					ok = false;
+				}
+				if (this.findConstructor(c.getArity()) != null) {
+					System.err.println("Duplicate constructor of arity " + c.getArity() + " in class " + this.name + ".");
+					ok = false;
+				}
+				c.setOwner(this);
+				this.constructors.add(c);
+				ok &= c.collectAndPartialResolve(_scope);
 			}
-			// Constructors: handled in a later step.
 		}
 		return ok;
 	}
@@ -96,6 +122,8 @@ public class ClassDeclaration implements Instruction, Declaration {
 				ok &= ((AttributeDeclaration) e).getType().completeResolve(_scope);
 			} else if (e instanceof MethodDeclaration) {
 				ok &= ((MethodDeclaration) e).completeResolve(_scope);
+			} else if (e instanceof ConstructorDeclaration) {
+				ok &= ((ConstructorDeclaration) e).completeResolve(_scope);
 			}
 		}
 		return ok;
@@ -107,6 +135,8 @@ public class ClassDeclaration implements Instruction, Declaration {
 		for (ClassElement e : this.elements) {
 			if (e instanceof MethodDeclaration) {
 				ok &= ((MethodDeclaration) e).checkType();
+			} else if (e instanceof ConstructorDeclaration) {
+				ok &= ((ConstructorDeclaration) e).checkType();
 			}
 		}
 		return ok;
@@ -126,6 +156,8 @@ public class ClassDeclaration implements Instruction, Declaration {
 		for (ClassElement e : this.elements) {
 			if (e instanceof MethodDeclaration) {
 				((MethodDeclaration) e).allocateMemory(Register.LB, 0);
+			} else if (e instanceof ConstructorDeclaration) {
+				((ConstructorDeclaration) e).allocateMemory(Register.LB, 0);
 			}
 		}
 		return 0;
@@ -137,6 +169,8 @@ public class ClassDeclaration implements Instruction, Declaration {
 		for (ClassElement e : this.elements) {
 			if (e instanceof MethodDeclaration) {
 				result.append(((MethodDeclaration) e).getCode(_factory));
+			} else if (e instanceof ConstructorDeclaration) {
+				result.append(((ConstructorDeclaration) e).getCode(_factory));
 			}
 		}
 		return result;

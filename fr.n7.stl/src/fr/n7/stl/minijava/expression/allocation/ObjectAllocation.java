@@ -10,8 +10,10 @@ import fr.n7.stl.minic.ast.scope.HierarchicalScope;
 import fr.n7.stl.minic.ast.type.Type;
 import fr.n7.stl.minijava.ast.type.ClassType;
 import fr.n7.stl.minijava.ast.type.declaration.ClassDeclaration;
+import fr.n7.stl.minijava.ast.type.declaration.ConstructorDeclaration;
 import fr.n7.stl.tam.ast.Fragment;
 import fr.n7.stl.tam.ast.Library;
+import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 import fr.n7.stl.util.Logger;
 
@@ -23,10 +25,13 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 
 	protected ClassType type;
 
+	protected ConstructorDeclaration constructor;
+
 	public ObjectAllocation(String _name, List<AccessibleExpression> _arguments) {
 		this.name = _name;
 		this.arguments = _arguments;
 		this.type = new ClassType(_name);
+		this.constructor = null;
 	}
 
 	@Override
@@ -44,11 +49,20 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 		for (AccessibleExpression a : this.arguments) {
 			ok &= a.completeResolve(_scope);
 		}
-		if (ok && this.type.getDeclaration() == null) {
+		if (!ok) {
+			return false;
+		}
+		ClassDeclaration cd = this.type.getDeclaration();
+		if (cd == null) {
 			Logger.error("Cannot allocate unknown class " + this.name);
 			return false;
 		}
-		return ok;
+		this.constructor = cd.findConstructor(this.arguments.size());
+		if (this.constructor == null && this.arguments.size() > 0) {
+			Logger.error("No constructor in " + this.name + " matches " + this.arguments.size() + " argument(s).");
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -60,9 +74,17 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
 		ClassDeclaration cd = this.type.getDeclaration();
-		// Step 4: heap-allocate the object, ignore constructor body.
 		result.add(_factory.createLoadL(cd.getObjectSize()));
 		result.add(Library.MAlloc);
+		if (this.constructor != null) {
+			// Duplicate the reference: one copy is consumed by the constructor (as `this`),
+			// the other remains as the result of `new`.
+			result.add(_factory.createLoad(Register.ST, -1, 1));
+			for (AccessibleExpression a : this.arguments) {
+				result.append(a.getCode(_factory));
+			}
+			result.add(_factory.createCall(this.constructor.getFunction().getName(), Register.SB));
+		}
 		return result;
 	}
 
