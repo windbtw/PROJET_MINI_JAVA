@@ -1,78 +1,111 @@
-/**
- * 
- */
 package fr.n7.stl.minijava.ast.type.declaration;
 
 import java.util.List;
 
-import fr.n7.stl.minic.ast.SemanticsUndefinedException;
 import fr.n7.stl.minic.ast.instruction.Instruction;
 import fr.n7.stl.minic.ast.instruction.declaration.FunctionDeclaration;
 import fr.n7.stl.minic.ast.scope.Declaration;
 import fr.n7.stl.minic.ast.scope.HierarchicalScope;
+import fr.n7.stl.minic.ast.scope.SymbolTable;
 import fr.n7.stl.minic.ast.type.Type;
+import fr.n7.stl.minijava.ast.type.ClassType;
 import fr.n7.stl.tam.ast.Fragment;
 import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 
-/**
- * 
- */
 public class ClassDeclaration implements Instruction, Declaration {
-	
+
 	protected List<ClassElement> elements;
-	
+
 	protected boolean concrete;
-	
+
 	protected String name;
-	
+
 	protected String ancestor;
 
-	/**
-	 * 
-	 */
+	/** Internal scope holding the class members (attributes for now). */
+	protected SymbolTable members;
+
+	/** Total size in TAM words of an instance of this class. */
+	protected int objectSize;
+
 	public ClassDeclaration(boolean _concrete, String _name, String _ancestor, List<ClassElement> _elements) {
 		this.concrete = _concrete;
 		this.name = _name;
 		this.ancestor = _ancestor;
 		this.elements = _elements;
+		this.objectSize = 0;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public ClassDeclaration(boolean _concrete, String _name, List<ClassElement> _elements) {
-		this( _concrete, _name, null, _elements);
+		this(_concrete, _name, null, _elements);
+	}
+
+	public int getObjectSize() {
+		return this.objectSize;
 	}
 
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
-		throw new SemanticsUndefinedException( "Semantics collect is undefined in ClassDeclaration.");
+		if (!_scope.accepts(this)) {
+			System.err.println("Class " + this.name + " already declared.");
+			return false;
+		}
+		_scope.register(this);
+		this.members = new SymbolTable(_scope);
+		boolean ok = true;
+		for (ClassElement e : this.elements) {
+			if (e instanceof AttributeDeclaration) {
+				if (this.members.accepts(e)) {
+					this.members.register(e);
+				} else {
+					System.err.println("Attribute " + e.getName() + " duplicated in class " + this.name + ".");
+					ok = false;
+				}
+			}
+			// Methods / constructors: handled in a later step.
+		}
+		return ok;
 	}
 
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope, FunctionDeclaration _container) {
-		throw new SemanticsUndefinedException( "Semantics resolve is undefined in ClassDeclaration.");
+		return this.collectAndPartialResolve(_scope);
 	}
 
 	@Override
 	public boolean completeResolve(HierarchicalScope<Declaration> _scope) {
-		throw new SemanticsUndefinedException( "Semantics resolve is undefined in ClassDeclaration.");
+		boolean ok = true;
+		for (ClassElement e : this.elements) {
+			if (e instanceof AttributeDeclaration) {
+				ok &= ((AttributeDeclaration) e).getType().completeResolve(_scope);
+			}
+		}
+		return ok;
 	}
 
 	@Override
 	public boolean checkType() {
-		throw new SemanticsUndefinedException( "Semantics check type is undefined in ClassDeclaration.");
+		return true;
 	}
 
 	@Override
 	public int allocateMemory(Register _register, int _offset) {
-		throw new SemanticsUndefinedException( "Semantics allocation memory is undefined in ClassDeclaration.");
+		int current = 0;
+		for (ClassElement e : this.elements) {
+			if (e instanceof AttributeDeclaration) {
+				AttributeDeclaration a = (AttributeDeclaration) e;
+				a.setOffset(current);
+				current += a.getLength();
+			}
+		}
+		this.objectSize = current;
+		return 0;
 	}
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
-		throw new SemanticsUndefinedException( "Semantics get code is undefined in ClassDeclaration.");
+		return _factory.createFragment();
 	}
 
 	@Override
@@ -82,14 +115,13 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	@Override
 	public Type getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ClassType(this.name);
 	}
-	
+
 	@Override
 	public String toString() {
 		String image = "";
-		if (! this.concrete) {
+		if (!this.concrete) {
 			image += "abstract ";
 		}
 		image += "class " + this.name + " ";
