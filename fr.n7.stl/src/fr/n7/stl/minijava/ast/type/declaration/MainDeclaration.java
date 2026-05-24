@@ -12,11 +12,11 @@ import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 
 public class MainDeclaration implements Instruction {
-	
+
 	protected String name;
-	
+
 	protected List<Declaration> declarations;
-	
+
 	protected Block main;
 
 	public MainDeclaration(String _name, List<Declaration> _declarations, Block _main) {
@@ -27,44 +27,64 @@ public class MainDeclaration implements Instruction {
 
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean ok = true;
+		for (Declaration d : this.declarations) {
+			ok &= ((Instruction) d).collectAndPartialResolve(_scope);
+		}
+		ok &= this.main.collectAndPartialResolve(_scope);
+		return ok;
 	}
 
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope, FunctionDeclaration _container) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.collectAndPartialResolve(_scope);
 	}
 
 	@Override
 	public boolean completeResolve(HierarchicalScope<Declaration> _scope) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean ok = true;
+		for (Declaration d : this.declarations) {
+			ok &= ((Instruction) d).completeResolve(_scope);
+		}
+		ok &= this.main.completeResolve(_scope);
+		return ok;
 	}
 
 	@Override
 	public boolean checkType() {
-		// TODO Auto-generated method stub
-		return false;
+		boolean ok = true;
+		for (Declaration d : this.declarations) {
+			ok &= ((Instruction) d).checkType();
+		}
+		ok &= this.main.checkType();
+		return ok;
 	}
 
 	@Override
 	public int allocateMemory(Register _register, int _offset) {
-		// TODO Auto-generated method stub
-		return 0;
+		int size = 0;
+		for (Declaration d : this.declarations) {
+			size += ((Instruction) d).allocateMemory(Register.SB, _offset + size);
+		}
+		this.main.allocateMemory(Register.LB, 0);
+		return size;
 	}
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
-		// TODO Auto-generated method stub
-		return null;
+		Fragment result = _factory.createFragment();
+		result.append(this.main.getCode(_factory));
+		result.add(_factory.createHalt());
+		for (Declaration d : this.declarations) {
+			result.append(((Instruction) d).getCode(_factory));
+		}
+		return result;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	@Override
 	public String toString() {
 		String image = "";
@@ -75,7 +95,7 @@ public class MainDeclaration implements Instruction {
 			image += uneDeclaration;
 			image += "\n";
 		}
-		image += "\tpublic static void Main( String[] args) ";
+		image += "\tpublic static void main( String[] args) ";
 		image += this.main;
 		image += "\n";
 		image += "}\n";
