@@ -33,6 +33,12 @@ public class ClassDeclaration implements Instruction, Declaration {
 	/** Constructors of this class (indexed lookup by arity). */
 	protected List<ConstructorDeclaration> constructors = new ArrayList<>();
 
+	/** Resolved parent class (null if this class has no `extends`). */
+	protected ClassDeclaration parent;
+
+	/** Guard to make allocateMemory recursion idempotent. */
+	protected boolean memoryAllocated = false;
+
 	public ClassDeclaration(boolean _concrete, String _name, String _ancestor, List<ClassElement> _elements) {
 		this.concrete = _concrete;
 		this.name = _name;
@@ -51,6 +57,33 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	public SymbolTable getMembers() {
 		return this.members;
+	}
+
+	public ClassDeclaration getParent() {
+		return this.parent;
+	}
+
+	/** Walks the class chain looking for an attribute or method by name. */
+	public Declaration lookupMember(String memberName) {
+		if (this.members != null && this.members.contains(memberName)) {
+			return this.members.get(memberName);
+		}
+		if (this.parent != null) {
+			return this.parent.lookupMember(memberName);
+		}
+		return null;
+	}
+
+	/** True if this class is `other` or a (transitive) subclass of it. */
+	public boolean isSubclassOf(ClassDeclaration other) {
+		ClassDeclaration c = this;
+		while (c != null) {
+			if (c == other) {
+				return true;
+			}
+			c = c.parent;
+		}
+		return false;
 	}
 
 	/** Find a constructor whose user-arity matches (or null). */
@@ -117,6 +150,19 @@ public class ClassDeclaration implements Instruction, Declaration {
 	@Override
 	public boolean completeResolve(HierarchicalScope<Declaration> _scope) {
 		boolean ok = true;
+		if (this.ancestor != null) {
+			Declaration d = _scope.get(this.ancestor);
+			if (d instanceof ClassDeclaration) {
+				this.parent = (ClassDeclaration) d;
+				if (this.parent == this) {
+					System.err.println("Class " + this.name + " cannot extend itself.");
+					ok = false;
+				}
+			} else {
+				System.err.println("Unknown parent class " + this.ancestor + " for " + this.name + ".");
+				ok = false;
+			}
+		}
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				ok &= ((AttributeDeclaration) e).getType().completeResolve(_scope);
@@ -144,7 +190,17 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	@Override
 	public int allocateMemory(Register _register, int _offset) {
+		if (this.memoryAllocated) {
+			return 0;
+		}
+		this.memoryAllocated = true;
+		// Layout: parent attributes first, then own attributes, so the child's
+		// memory image is a superset of the parent's at the same offsets.
 		int current = 0;
+		if (this.parent != null) {
+			this.parent.allocateMemory(_register, _offset);
+			current = this.parent.getObjectSize();
+		}
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				AttributeDeclaration a = (AttributeDeclaration) e;

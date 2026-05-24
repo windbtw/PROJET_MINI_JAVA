@@ -40,7 +40,7 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 			Logger.error("Class type for attribute access is not resolved.");
 			return false;
 		}
-		Declaration d = cd.getMembers().get(this.name);
+		Declaration d = cd.lookupMember(this.name);
 		if (!(d instanceof AttributeDeclaration)) {
 			Logger.error("Attribute " + this.name + " not found in class " + cd.getName());
 			return false;

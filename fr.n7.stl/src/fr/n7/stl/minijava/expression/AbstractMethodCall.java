@@ -69,7 +69,7 @@ public abstract class AbstractMethodCall<ObjectKind extends Expression> implemen
 			Logger.error("Class type for method call is not resolved.");
 			return false;
 		}
-		Declaration d = cd.getMembers().get(this.name);
+		Declaration d = cd.lookupMember(this.name);
 		if (!(d instanceof MethodDeclaration)) {
 			Logger.error("Method " + this.name + " not found in class " + cd.getName());
 			return false;

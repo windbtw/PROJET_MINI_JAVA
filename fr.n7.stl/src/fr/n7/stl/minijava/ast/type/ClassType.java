@@ -34,7 +34,16 @@ public class ClassType implements Type {
 
 	@Override
 	public boolean compatibleWith(Type _other) {
-		// Inheritance handled in a later step; for now strict equality.
+		// self is compatible with _other iff self is a subtype of _other.
+		if (!(_other instanceof ClassType)) {
+			return false;
+		}
+		ClassDeclaration selfDecl = this.declaration;
+		ClassDeclaration otherDecl = ((ClassType) _other).declaration;
+		if (selfDecl != null && otherDecl != null) {
+			return selfDecl.isSubclassOf(otherDecl);
+		}
+		// Fall back to name equality if declarations are not resolved yet.
 		return this.equalsTo(_other);
 	}
 
