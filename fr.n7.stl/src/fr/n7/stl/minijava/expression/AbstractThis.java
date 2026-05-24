@@ -15,6 +15,10 @@ public abstract class AbstractThis<ObjectKind extends Expression> implements Exp
 	public AbstractThis() {
 	}
 
+	public ParameterDeclaration getDeclaration() {
+		return this.declaration;
+	}
+
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
 		Declaration d = _scope.get("this");
