@@ -43,7 +43,7 @@ public class MethodCallAccess extends AbstractMethodCall<AccessibleExpression> i
 			result.add(_factory.createLoadL(slot));
 			result.add(Library.IAdd);
 			result.add(_factory.createLoadI(1));
-			result.add(_factory.createCallI(Register.SB));
+			result.add(_factory.createCallI());
 		}
 		return result;
 	}

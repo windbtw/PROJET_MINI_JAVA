@@ -118,7 +118,7 @@ public class MethodCall implements Instruction {
 			result.add(_factory.createLoadL(slot));
 			result.add(Library.IAdd);
 			result.add(_factory.createLoadI(1));
-			result.add(_factory.createCallI(Register.SB));
+			result.add(_factory.createCallI());
 		}
 		// Discard return value when used as an instruction.
 		int returnSize = this.method.getType().length();
