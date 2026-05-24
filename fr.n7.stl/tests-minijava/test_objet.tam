@@ -1,0 +1,28 @@
+LOADL 2
+SUBR MAlloc
+LOADL 3
+LOAD (1) 0[LB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+LOADL 4
+LOAD (1) 0[LB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@16b4a017
+;(p.x + p.y)
+LOAD (1) 0[LB]
+LOADL 0
+SUBR IAdd
+LOADI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@8807e25
+LOAD (1) 0[LB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IAdd
+SUBR IOut
+HALT
+HALT
+

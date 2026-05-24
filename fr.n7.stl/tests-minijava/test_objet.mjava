@@ -1,0 +1,13 @@
+class Point {
+    public int x;
+    public int y;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Point p = new Point();
+        p.x = 3;
+        p.y = 4;
+        print p.x + p.y;
+    }
+}

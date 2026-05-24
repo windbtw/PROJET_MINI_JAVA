@@ -1,0 +1,26 @@
+LOADL 1
+SUBR MAlloc
+LOADL 5
+LOAD (1) 0[LB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@1bc6a36e
+LOAD (1) 0[LB]
+LOADL 3
+CALL (SB) Counter_incremented
+SUBR IOut
+HALT
+;(this.value + by)
+Counter_incremented
+LOAD (1) -2[LB]
+LOADL 0
+SUBR IAdd
+LOADI (1)
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@1ff8b8f
+LOAD (1) -1[LB]
+SUBR IAdd
+RETURN (1) 2
+RETURN (1) 2
+HALT
+

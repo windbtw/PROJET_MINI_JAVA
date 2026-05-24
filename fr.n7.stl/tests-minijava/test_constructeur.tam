@@ -1,0 +1,40 @@
+LOADL 2
+SUBR MAlloc
+LOAD (1) -1[ST]
+LOADL 10
+LOADL 32
+CALL (SB) Point_init_2
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@f5f2bb7
+LOAD (1) 0[LB]
+CALL (SB) Point_sum
+SUBR IOut
+HALT
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@73035e27
+Point_init_2
+LOAD (1) -2[LB]
+LOAD (1) -3[LB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@64c64813
+LOAD (1) -1[LB]
+LOAD (1) -3[LB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+RETURN (0) 3
+;(this.x + this.y)
+Point_sum
+LOAD (1) -1[LB]
+LOADL 0
+SUBR IAdd
+LOADI (1)
+LOAD (1) -1[LB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IAdd
+RETURN (1) 1
+RETURN (1) 1
+HALT
+

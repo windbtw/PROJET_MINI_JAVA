@@ -1,0 +1,11 @@
+class Point {
+    public int x;
+    public int y;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        int z = 5;
+        print z;
+    }
+}

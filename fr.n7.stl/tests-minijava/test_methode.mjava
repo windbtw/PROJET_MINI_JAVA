@@ -1,0 +1,15 @@
+class Counter {
+    public int value;
+
+    public int incremented(int by) {
+        return this.value + by;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Counter c = new Counter();
+        c.value = 5;
+        print c.incremented(3);
+    }
+}

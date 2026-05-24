@@ -1,0 +1,26 @@
+class A {
+    public int x;
+    public A(int v) {
+        this.x = v;
+    }
+    public int getX() {
+        return this.x;
+    }
+}
+
+class B extends A {
+    public B(int v) {
+        super(v);
+    }
+    public int getX() {
+        return super.getX() + 10;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        B b = new B(5);
+        print b.getX();
+        print b.x;
+    }
+}

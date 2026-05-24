@@ -1,0 +1,33 @@
+class Animal {
+    public int legs;
+
+    public Animal(int n) {
+        this.legs = n;
+    }
+
+    public int countLegs() {
+        return this.legs;
+    }
+}
+
+class Dog extends Animal {
+    public int barks;
+
+    public Dog(int l, int b) {
+        this.legs = l;
+        this.barks = b;
+    }
+
+    public int countBarks() {
+        return this.barks;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog(4, 3);
+        print d.countLegs();
+        print d.countBarks();
+        print d.legs + d.barks;
+    }
+}

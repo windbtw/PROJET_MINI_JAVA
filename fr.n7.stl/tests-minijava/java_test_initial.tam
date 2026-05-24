@@ -1,0 +1,10 @@
+;(3 + 4)
+LOADL 3
+LOADL 4
+SUBR IAdd
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@6a38e57f
+LOAD (1) 0[LB]
+SUBR IOut
+HALT
+HALT
+
