@@ -103,23 +103,10 @@ public class MethodCall implements Instruction {
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
 		result.append(this.target.getCode(_factory));
-		int argsSize = 0;
 		for (AccessibleExpression a : this.arguments) {
 			result.append(a.getCode(_factory));
-			argsSize += a.getType().length();
 		}
-		if (this.target instanceof SuperAccess) {
-			result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
-		} else {
-			ClassDeclaration staticClass = ((ClassType) this.target.getType()).getDeclaration();
-			int slot = staticClass.getMethodSlot(this.name);
-			result.add(_factory.createLoad(Register.ST, -(1 + argsSize), 1));
-			result.add(_factory.createLoadI(1));
-			result.add(_factory.createLoadL(slot));
-			result.add(Library.IAdd);
-			result.add(_factory.createLoadI(1));
-			result.add(_factory.createCallI());
-		}
+		result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
 		// Discard return value when used as an instruction.
 		int returnSize = this.method.getType().length();
 		if (returnSize > 0) {

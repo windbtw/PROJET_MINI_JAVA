@@ -230,24 +230,17 @@ public class ClassDeclaration implements Instruction, Declaration {
 			return 0;
 		}
 		this.memoryAllocated = true;
-		// Layout: [vtable_ptr] [parent attributes...] [own attributes...]
-		// Slot 0 is reserved for the vtable pointer (used for late binding).
-		int current;
+		// Layout: parent attributes first, then own attributes.
+		int current = 0;
 		if (this.parent != null) {
 			this.parent.allocateMemory(_register, _offset);
 			current = this.parent.getObjectSize();
-			this.vtable.putAll(this.parent.vtable);
-		} else {
-			current = 1; // reserve obj[0] for vtable pointer
 		}
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				AttributeDeclaration a = (AttributeDeclaration) e;
 				a.setOffset(current);
 				current += a.getLength();
-			} else if (e instanceof MethodDeclaration) {
-				// New methods append a slot; same-name methods override the inherited slot.
-				this.vtable.put(e.getName(), (MethodDeclaration) e);
 			}
 		}
 		this.objectSize = current;
