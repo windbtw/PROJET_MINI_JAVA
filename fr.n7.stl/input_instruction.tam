@@ -1,0 +1,42 @@
+LOADL 10
+LOADL 3
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2eafffde
+;(x > y)
+LOAD (1) 0[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@59690aa4
+LOAD (1) 1[LB]
+SUBR IGtr
+JUMPIF (0) else2
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@1761e840
+LOAD (1) 0[LB]
+SUBR IOut
+JUMP endif1
+else2
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@6c629d6e
+LOAD (1) 1[LB]
+SUBR IOut
+JUMP endif1
+endif1
+LOADL 3
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5ecddf8f
+;(i > 0)
+while3
+LOAD (1) 2[LB]
+LOADL 0
+SUBR IGtr
+JUMPIF (0) endwhile4
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@3f102e87
+LOAD (1) 2[LB]
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@27abe2cd
+;(i - 1)
+LOAD (1) 2[LB]
+LOADL 1
+SUBR ISub
+; i 
+STORE (1) 2[LB]
+JUMP while3
+endwhile4
+HALT
+HALT
+

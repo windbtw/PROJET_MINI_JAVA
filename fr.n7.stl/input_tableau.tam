@@ -1,0 +1,52 @@
+LOADL 3
+LOADL 1
+SUBR IMul
+SUBR MAlloc
+LOADL 10
+LOAD (1) 0[LB]
+LOADL 0
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+LOADL 20
+LOAD (1) 0[LB]
+LOADL 1
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+LOADL 30
+LOAD (1) 0[LB]
+LOADL 2
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@64b8f8f4
+LOAD (1) 0[LB]
+LOADL 0
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2db0f6b2
+LOAD (1) 0[LB]
+LOADL 1
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@3cd1f1c8
+LOAD (1) 0[LB]
+LOADL 2
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+HALT
+HALT
+

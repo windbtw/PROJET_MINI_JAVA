@@ -1,0 +1,13 @@
+LOADL 1
+SUBR MAlloc
+LOADL 42
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5f8ed237
+LOAD (1) 0[LB]
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2f410acf
+LOAD (1) 0[LB]
+LOADI (1)
+SUBR IOut
+HALT
+HALT
+

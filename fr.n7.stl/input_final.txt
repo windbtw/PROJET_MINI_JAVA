@@ -1,0 +1,86 @@
+void main() {
+
+
+    // Arithmetique
+    print 3 + 7;
+    print 10 - 4;
+    print 3 * 5;
+    print 10 / 3;
+    print 10 % 3;
+    print -5;
+
+    // Comparaisons
+    print 3 < 7;
+    print 7 >= 7;
+    print 5 == 5;
+    print 5 != 3;
+
+    // Booleen
+    print !false;
+    print true;
+
+    // Char
+    char c = 'A';
+    print c;
+
+    // Constante
+    const int K = 99;
+    print K;
+
+
+    int x = 10;
+    int y = 3;
+
+    // if / else
+    if (x > y) {
+        print x;
+    } else {
+        print y;
+    }
+
+    // while
+    int i = 3;
+    while (i > 0) {
+        print i;
+        i = i - 1;
+    }
+
+
+    // Code lecture : fst / snd
+    print fst <8, 2>;
+    print snd <8, 2>;
+
+    int arr[] = new int[3];
+
+    // Code ecriture : arr[i] = v
+    arr[0] = 10;
+    arr[1] = 20;
+    arr[2] = 30;
+
+    // Code lecture : print arr[i]
+    print arr[0];
+    print arr[1];
+    print arr[2];
+
+
+    int * p = new int();
+
+    // Code ecriture : *p = v
+    *p = 42;
+
+    // Code lecture : print *p
+    print *p;
+
+
+    struct Pt { int x; int y; } pt = {5, 10};
+
+    // Code lecture : pt.champ
+    print pt.x;
+    print pt.y;
+
+    // Code ecriture : pt.champ = v
+    pt.x = 99;
+    print pt.x;
+
+
+}

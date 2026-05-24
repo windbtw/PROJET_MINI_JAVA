@@ -1,0 +1,5 @@
+void main() {
+    const int K = 5;
+    const int K = 99;
+    print K;
+}

@@ -1,0 +1,186 @@
+;(3 + 7)
+LOADL 3
+LOADL 7
+SUBR IAdd
+SUBR IOut
+;(10 - 4)
+LOADL 10
+LOADL 4
+SUBR ISub
+SUBR IOut
+;(3 * 5)
+LOADL 3
+LOADL 5
+SUBR IMul
+SUBR IOut
+;(10 / 3)
+LOADL 10
+LOADL 3
+SUBR IDiv
+SUBR IOut
+;(10 % 3)
+LOADL 10
+LOADL 3
+SUBR IMod
+SUBR IOut
+;(- 5)
+LOADL 5
+SUBR INeg
+SUBR IOut
+;(3 < 7)
+LOADL 3
+LOADL 7
+SUBR ILss
+SUBR BOut
+;(7 >= 7)
+LOADL 7
+LOADL 7
+SUBR IGeq
+SUBR BOut
+;(5 == 5)
+LOADL 5
+LOADL 5
+SUBR IEq
+SUBR BOut
+;(5 != 3)
+LOADL 5
+LOADL 3
+SUBR INeq
+SUBR BOut
+;(! false)
+LOADL 0
+SUBR BNeg
+SUBR BOut
+LOADL 1
+SUBR BOut
+LOADL 65
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@75412c2f
+LOAD (1) 0[LB]
+SUBR COut
+LOADL 99
+SUBR IOut
+LOADL 10
+LOADL 3
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@282ba1e
+;(x > y)
+LOAD (1) 1[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@13b6d03
+LOAD (1) 2[LB]
+SUBR IGtr
+JUMPIF (0) else2
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@f5f2bb7
+LOAD (1) 1[LB]
+SUBR IOut
+JUMP endif1
+else2
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@73035e27
+LOAD (1) 2[LB]
+SUBR IOut
+JUMP endif1
+endif1
+LOADL 3
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@64c64813
+;(i > 0)
+while3
+LOAD (1) 3[LB]
+LOADL 0
+SUBR IGtr
+JUMPIF (0) endwhile4
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@3ecf72fd
+LOAD (1) 3[LB]
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@483bf400
+;(i - 1)
+LOAD (1) 3[LB]
+LOADL 1
+SUBR ISub
+; i 
+STORE (1) 3[LB]
+JUMP while3
+endwhile4
+LOADL 8
+LOADL 2
+POP (0) 1
+SUBR IOut
+LOADL 8
+LOADL 2
+POP (1) 1
+SUBR IOut
+LOADL 3
+LOADL 1
+SUBR IMul
+SUBR MAlloc
+LOADL 10
+LOAD (1) 4[LB]
+LOADL 0
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+LOADL 20
+LOAD (1) 4[LB]
+LOADL 1
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+LOADL 30
+LOAD (1) 4[LB]
+LOADL 2
+LOADL 1
+SUBR IMul
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@21a06946
+LOAD (1) 4[LB]
+LOADL 0
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@77f03bb1
+LOAD (1) 4[LB]
+LOADL 1
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@326de728
+LOAD (1) 4[LB]
+LOADL 2
+LOADL 1
+SUBR IMul
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+LOADL 1
+SUBR MAlloc
+LOADL 42
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@25618e91
+LOAD (1) 5[LB]
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@7a92922
+LOAD (1) 5[LB]
+LOADI (1)
+SUBR IOut
+LOADL 5
+LOADL 10
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@71f2a7d5
+LOAD (2) 6[LB]
+POP (0) 1
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2cfb4a64
+LOAD (2) 6[LB]
+POP (1) 1
+SUBR IOut
+LOADL 99
+STORE (1) 6[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5474c6c
+LOAD (2) 6[LB]
+POP (0) 1
+SUBR IOut
+HALT
+HALT
+

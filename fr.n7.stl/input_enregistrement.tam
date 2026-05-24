@@ -1,0 +1,19 @@
+LOADL 5
+LOADL 10
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@4c3e4790
+LOAD (2) 0[LB]
+POP (0) 1
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5679c6c6
+LOAD (2) 0[LB]
+POP (1) 1
+SUBR IOut
+LOADL 99
+STORE (1) 0[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@27ddd392
+LOAD (2) 0[LB]
+POP (0) 1
+SUBR IOut
+HALT
+HALT
+

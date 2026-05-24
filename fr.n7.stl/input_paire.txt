@@ -1,0 +1,4 @@
+void main() {
+    print fst <8, 2>;
+    print snd <8, 2>;
+}
