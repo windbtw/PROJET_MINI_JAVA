@@ -8,13 +8,13 @@ import fr.n7.stl.tam.ast.TAMFactory;
 public class ThisAssignment extends AbstractThis<AssignableExpression> implements AssignableExpression {
 
 	public ThisAssignment() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
-		// TODO Auto-generated method stub
-		return null;
+		// `this = ...` is not a meaningful assignment in our subset. Use `this.x = ...` instead.
+		throw new UnsupportedOperationException("Assignment to 'this' is not supported.");
 	}
 
 }

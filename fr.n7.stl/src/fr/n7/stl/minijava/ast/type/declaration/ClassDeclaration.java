@@ -66,8 +66,19 @@ public class ClassDeclaration implements Instruction, Declaration {
 					System.err.println("Attribute " + e.getName() + " duplicated in class " + this.name + ".");
 					ok = false;
 				}
+			} else if (e instanceof MethodDeclaration) {
+				MethodDeclaration m = (MethodDeclaration) e;
+				m.setOwner(this);
+				if (this.members.accepts(m)) {
+					this.members.register(m);
+				} else {
+					System.err.println("Method " + m.getName() + " duplicated in class " + this.name + ".");
+					ok = false;
+				}
+				// Method body's local scope: parent = outer scope (so other classes / globals are visible).
+				ok &= m.collectAndPartialResolve(_scope);
 			}
-			// Methods / constructors: handled in a later step.
+			// Constructors: handled in a later step.
 		}
 		return ok;
 	}
@@ -83,6 +94,8 @@ public class ClassDeclaration implements Instruction, Declaration {
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				ok &= ((AttributeDeclaration) e).getType().completeResolve(_scope);
+			} else if (e instanceof MethodDeclaration) {
+				ok &= ((MethodDeclaration) e).completeResolve(_scope);
 			}
 		}
 		return ok;
@@ -90,7 +103,13 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	@Override
 	public boolean checkType() {
-		return true;
+		boolean ok = true;
+		for (ClassElement e : this.elements) {
+			if (e instanceof MethodDeclaration) {
+				ok &= ((MethodDeclaration) e).checkType();
+			}
+		}
+		return ok;
 	}
 
 	@Override
@@ -104,12 +123,23 @@ public class ClassDeclaration implements Instruction, Declaration {
 			}
 		}
 		this.objectSize = current;
+		for (ClassElement e : this.elements) {
+			if (e instanceof MethodDeclaration) {
+				((MethodDeclaration) e).allocateMemory(Register.LB, 0);
+			}
+		}
 		return 0;
 	}
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
-		return _factory.createFragment();
+		Fragment result = _factory.createFragment();
+		for (ClassElement e : this.elements) {
+			if (e instanceof MethodDeclaration) {
+				result.append(((MethodDeclaration) e).getCode(_factory));
+			}
+		}
+		return result;
 	}
 
 	@Override
