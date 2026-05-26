@@ -76,6 +76,13 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 		ClassDeclaration cd = this.type.getDeclaration();
 		result.add(_factory.createLoadL(cd.getObjectSize()));
 		result.add(Library.MAlloc);
+		
+		// Initialize the VMT pointer
+		// Stack currently has: [ object_address ]
+		result.add(_factory.createLoad(Register.SB, cd.getVmtPointerOffset(), 1)); // Push VMT_pointer (value)
+		result.add(_factory.createLoad(Register.ST, -2, 1)); // Push object_address (address)
+		result.add(_factory.createStoreI(1)); // Store value at address
+
 		if (this.constructor != null) {
 			// Duplicate the reference: one copy is consumed by the constructor (as `this`),
 			// the other remains as the result of `new`.

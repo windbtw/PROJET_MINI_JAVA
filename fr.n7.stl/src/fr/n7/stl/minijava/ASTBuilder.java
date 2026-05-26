@@ -130,12 +130,37 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
                     System.out.println("Type verification succeeded.");
 
                     System.out.println("Code generation ...");
+                    int vmtCurrentOffset = 0;
                     for (ClassDeclaration c : this.classes) {
                     	c.allocateMemory(Register.SB, 0);
+                        c.setVmtPointerOffset(vmtCurrentOffset);
+                        vmtCurrentOffset += 1;
                     }
-                    this.main.allocateMemory(Register.SB, 0);
+                    this.main.allocateMemory(Register.SB, vmtCurrentOffset);
+
                     TAMFactory factory = new TAMFactoryImpl();
                     Fragment f = factory.createFragment();
+                    
+                    // Generate VMT initialization
+                    if (vmtCurrentOffset > 0) {
+                        f.add(factory.createPush(vmtCurrentOffset));
+                    }
+                    for (ClassDeclaration c : this.classes) {
+                        List<MethodDeclaration> vmt = c.getVmt();
+                        f.add(factory.createLoadL(vmt.size()));
+                        f.add(Library.MAlloc);
+                        f.add(factory.createStore(Register.SB, c.getVmtPointerOffset(), 1));
+                        
+                        for (int i = 0; i < vmt.size(); i++) {
+                            MethodDeclaration m = vmt.get(i);
+                            f.add(factory.createLoadA(m.getFunction().getName()));
+                            f.add(factory.createLoad(Register.SB, c.getVmtPointerOffset(), 1));
+                            f.add(factory.createLoadL(i));
+                            f.add(Library.IAdd);
+                            f.add(factory.createStoreI(1));
+                        }
+                    }
+
                     // Main code first (entry point), then class method bodies (reached by CALL).
                     f.append(this.main.getCode(factory));
                     for (ClassDeclaration c : this.classes) {

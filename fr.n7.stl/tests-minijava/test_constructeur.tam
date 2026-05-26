@@ -1,36 +1,54 @@
-LOADL 2
+PUSH 1
+LOADL 1
 SUBR MAlloc
+STORE (1) 0[SB]
+LOADA Point_sum
+LOAD (1) 0[SB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+LOADL 3
+SUBR MAlloc
+LOAD (1) 0[SB]
+LOAD (1) -2[ST]
+STOREI (1)
 LOAD (1) -1[ST]
 LOADL 10
 LOADL 32
 CALL (SB) Point_init_2
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@f5f2bb7
-LOAD (1) 0[LB]
-CALL (SB) Point_sum
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@44e81672
+LOAD (1) 1[SB]
+LOADL 0
+LOAD (1) -2[ST]
+LOADI (1)
+LOADL 0
+SUBR IAdd
+LOADI (1)
+CALLI
 SUBR IOut
 HALT
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@73035e27
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@60215eee
 Point_init_2
 LOAD (1) -2[LB]
 LOAD (1) -3[LB]
-LOADL 0
+LOADL 1
 SUBR IAdd
 STOREI (1)
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@64c64813
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@4ca8195f
 LOAD (1) -1[LB]
 LOAD (1) -3[LB]
-LOADL 1
+LOADL 2
 SUBR IAdd
 STOREI (1)
 RETURN (0) 3
 ;(this.x + this.y)
 Point_sum
 LOAD (1) -1[LB]
-LOADL 0
+LOADL 1
 SUBR IAdd
 LOADI (1)
 LOAD (1) -1[LB]
-LOADL 1
+LOADL 2
 SUBR IAdd
 LOADI (1)
 SUBR IAdd

@@ -106,7 +106,23 @@ public class MethodCall implements Instruction {
 		for (AccessibleExpression a : this.arguments) {
 			result.append(a.getCode(_factory));
 		}
-		result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
+		
+		if (this.target instanceof SuperAccess) {
+			result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
+		} else {
+			int argsSize = 0;
+			for (AccessibleExpression a : this.arguments) {
+				argsSize += a.getType().length();
+			}
+			result.add(_factory.createLoadL(0)); // Push static link
+			result.add(_factory.createLoad(Register.ST, -argsSize - 2, 1)); // duplicate target
+			result.add(_factory.createLoadI(1));
+			result.add(_factory.createLoadL(this.method.getVmtOffset()));
+			result.add(Library.IAdd);
+			result.add(_factory.createLoadI(1));
+			result.add(_factory.createCallI());
+		}
+
 		// Discard return value when used as an instruction.
 		int returnSize = this.method.getType().length();
 		if (returnSize > 0) {

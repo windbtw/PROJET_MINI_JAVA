@@ -32,6 +32,16 @@ public class MethodDeclaration extends ClassElement implements Instruction {
 	/** Synthetic FunctionDeclaration used to delegate all semantic methods. */
 	protected FunctionDeclaration function;
 
+	protected int vmtOffset = -1;
+
+	public int getVmtOffset() {
+		return this.vmtOffset;
+	}
+
+	public void setVmtOffset(int offset) {
+		this.vmtOffset = offset;
+	}
+
 	public MethodDeclaration(String _name, Type _type, List<ParameterDeclaration> _parameters, Block _body) {
 		super(_name);
 		this.parameters = _parameters;

@@ -1,6 +1,10 @@
+PUSH 1
+LOADL 0
+SUBR MAlloc
+STORE (1) 0[SB]
 LOADL 5
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@75828a0f
-LOAD (1) 0[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@77556fd
+LOAD (1) 1[SB]
 SUBR IOut
 HALT
 HALT

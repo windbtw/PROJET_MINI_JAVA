@@ -36,6 +36,19 @@ public class ClassDeclaration implements Instruction, Declaration {
 	/** Resolved parent class (null if this class has no `extends`). */
 	protected ClassDeclaration parent;
 
+	/** Virtual Method Table holding ordered method declarations. */
+	protected List<MethodDeclaration> vmt = new ArrayList<>();
+
+	protected int vmtPointerOffset = -1;
+
+	public int getVmtPointerOffset() {
+		return this.vmtPointerOffset;
+	}
+
+	public void setVmtPointerOffset(int offset) {
+		this.vmtPointerOffset = offset;
+	}
+
 	/** Guard to make allocateMemory recursion idempotent. */
 	protected boolean memoryAllocated = false;
 
@@ -188,18 +201,43 @@ public class ClassDeclaration implements Instruction, Declaration {
 		return ok;
 	}
 
+	public List<MethodDeclaration> getVmt() {
+		return this.vmt;
+	}
+
 	@Override
 	public int allocateMemory(Register _register, int _offset) {
 		if (this.memoryAllocated) {
 			return 0;
 		}
 		this.memoryAllocated = true;
-		// Layout: parent attributes first, then own attributes.
-		int current = 0;
+		// Layout: VMT pointer at offset 0, then parent attributes, then own attributes.
+		int current = 1;
 		if (this.parent != null) {
 			this.parent.allocateMemory(_register, _offset);
 			current = this.parent.getObjectSize();
+			this.vmt.addAll(this.parent.getVmt());
 		}
+		
+		for (ClassElement e : this.elements) {
+			if (e instanceof MethodDeclaration) {
+				MethodDeclaration m = (MethodDeclaration) e;
+				boolean overrides = false;
+				for (int i = 0; i < this.vmt.size(); i++) {
+					if (this.vmt.get(i).getName().equals(m.getName())) {
+						this.vmt.set(i, m);
+						m.setVmtOffset(i);
+						overrides = true;
+						break;
+					}
+				}
+				if (!overrides) {
+					m.setVmtOffset(this.vmt.size());
+					this.vmt.add(m);
+				}
+			}
+		}
+
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				AttributeDeclaration a = (AttributeDeclaration) e;

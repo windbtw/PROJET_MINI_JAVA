@@ -17,29 +17,30 @@ SUBR IAdd
 STOREI (1)
 LOADL 2
 SUBR MAlloc
-LOAD (1) -1[ST]
 LOAD (1) 1[SB]
+LOAD (1) -2[ST]
 STOREI (1)
 LOAD (1) -1[ST]
 LOADL 5
 CALL (SB) B_init_1
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5c0369c4
-LOAD (1) 2[LB]
-LOAD (1) -1[ST]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2a3046da
+LOAD (1) 2[SB]
+LOADL 0
+LOAD (1) -2[ST]
 LOADI (1)
 LOADL 0
 SUBR IAdd
 LOADI (1)
 CALLI
 SUBR IOut
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@17ed40e0
-LOAD (1) 2[LB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@2a098129
+LOAD (1) 2[SB]
 LOADL 1
 SUBR IAdd
 LOADI (1)
 SUBR IOut
 HALT
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@50675690
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@198e2867
 A_init_1
 LOAD (1) -1[LB]
 LOAD (1) -2[LB]
@@ -56,7 +57,7 @@ RETURN (1) 1
 RETURN (1) 1
 B_init_1
 LOAD (1) -2[LB]
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@31b7dea0
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@12f40c25
 LOAD (1) -1[LB]
 CALL (SB) A_init_1
 RETURN (0) 2
