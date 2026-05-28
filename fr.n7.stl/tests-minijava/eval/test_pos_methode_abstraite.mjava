@@ -1,0 +1,22 @@
+abstract class A {
+    public int x;
+
+    public abstract int compute();
+}
+
+class B extends A {
+    public B(int v) {
+        this.x = v;
+    }
+
+    public int compute() {
+        return this.x + 1;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        B b = new B(41);
+        print b.compute();
+    }
+}

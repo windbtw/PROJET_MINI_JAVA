@@ -1,0 +1,23 @@
+class A {
+    public int pub;
+    private int priv;
+    protected int prot;
+
+    public A() {
+        this.pub = 1;
+        this.priv = 2;
+        this.prot = 3;
+    }
+
+    public int getPriv() {
+        return this.priv;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new A();
+        print a.pub;
+        print a.getPriv();
+    }
+}

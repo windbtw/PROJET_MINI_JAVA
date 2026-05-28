@@ -1,0 +1,20 @@
+abstract class Shape {
+    public int size;
+
+    public Shape(int s) {
+        this.size = s;
+    }
+}
+
+class Square extends Shape {
+    public Square(int s) {
+        this.size = s;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Square sq = new Square(10);
+        print sq.size;
+    }
+}
