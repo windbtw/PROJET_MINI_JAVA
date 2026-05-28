@@ -1,0 +1,17 @@
+class A {
+    public A(int x) { }
+}
+
+class B extends A {
+    public B() {
+        // Erreur : on appelle le constructeur parent sans argument, 
+        // alors que A(int x) en demande un.
+        super();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        B b = new B();
+    }
+}

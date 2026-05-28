@@ -1,0 +1,27 @@
+class MathUtils {
+    public int factor;
+    
+    public MathUtils(int _factor) {
+        this.factor = _factor;
+    }
+    
+    public int multiply(int val) {
+        return (val * this.factor);
+    }
+    
+    public int addAndMultiply(MathUtils other, int val) {
+        // Teste le passage d'objet en paramètre et l'accès croisé aux attributs
+        int sum = (this.factor + other.factor);
+        return (sum * val);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MathUtils m1 = new MathUtils(2);
+        MathUtils m2 = new MathUtils(3);
+        
+        print m1.multiply(5); // 10
+        print m2.addAndMultiply(m1, 4); // (3+2)*4 = 20
+    }
+}

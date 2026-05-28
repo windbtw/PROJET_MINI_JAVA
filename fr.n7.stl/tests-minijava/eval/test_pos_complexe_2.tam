@@ -1,0 +1,96 @@
+PUSH 1
+LOADL 2
+SUBR MAlloc
+STORE (1) 0[SB]
+LOADA MathUtils_multiply
+LOAD (1) 0[SB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+LOADA MathUtils_addAndMultiply
+LOAD (1) 0[SB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+LOADL 2
+SUBR MAlloc
+LOAD (1) 0[SB]
+LOAD (1) -2[ST]
+STOREI (1)
+LOAD (1) -1[ST]
+LOADL 2
+CALL (SB) MathUtils_init_1
+LOADL 2
+SUBR MAlloc
+LOAD (1) 0[SB]
+LOAD (1) -2[ST]
+STOREI (1)
+LOAD (1) -1[ST]
+LOADL 3
+CALL (SB) MathUtils_init_1
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@449b2d27
+LOAD (1) 1[SB]
+LOADL 5
+LOADL 0
+LOAD (1) -3[ST]
+LOADI (1)
+LOADL 0
+SUBR IAdd
+LOADI (1)
+CALLI
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5479e3f
+LOAD (1) 2[SB]
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@27082746
+LOAD (1) 1[SB]
+LOADL 4
+LOADL 0
+LOAD (1) -4[ST]
+LOADI (1)
+LOADL 1
+SUBR IAdd
+LOADI (1)
+CALLI
+SUBR IOut
+HALT
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@66133adc
+MathUtils_init_1
+LOAD (1) -1[LB]
+LOAD (1) -2[LB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+RETURN (0) 2
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@7bfcd12c
+;(val * this.factor)
+MathUtils_multiply
+LOAD (1) -1[LB]
+LOAD (1) -2[LB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IMul
+RETURN (1) 2
+RETURN (1) 2
+;(this.factor + other.factor)
+MathUtils_addAndMultiply
+LOAD (1) -3[LB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@5b1d2887
+LOAD (1) -2[LB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IAdd
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@46f5f779
+;(sum * val)
+LOAD (1) 3[LB]
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@1c2c22f3
+LOAD (1) -1[LB]
+SUBR IMul
+RETURN (1) 3
+RETURN (1) 3
+HALT
+

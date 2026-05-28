@@ -1,0 +1,53 @@
+class Animal {
+    public int age;
+    
+    public Animal(int a) { 
+        this.age = a; 
+    }
+    
+    public int getAge() { 
+        return this.age; 
+    }
+    
+    public int speak() { 
+        return 0; 
+    }
+}
+
+class Dog extends Animal {
+    public int barkVolume;
+    
+    public Dog(int a, int v) { 
+        super(a); 
+        this.barkVolume = v; 
+    }
+    
+    public int speak() { 
+        return this.barkVolume; 
+    }
+}
+
+class Puppy extends Dog {
+    public Puppy(int a) { 
+        super(a, 1); 
+    }
+    
+    // Le chiot aboie un peu plus fort que son volume de base
+    public int speak() { 
+        return (super.speak() + 1); 
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Polymorphisme : des variables de type Animal contiennent différents sous-types
+        Animal a1 = new Animal(10);
+        Animal a2 = new Dog(5, 8);
+        Animal a3 = new Puppy(1);
+        
+        print a1.speak(); // Doit afficher 0
+        print a2.speak(); // Doit afficher 8
+        print a3.speak(); // Doit afficher 2
+        print a3.getAge(); // Doit afficher 1 (hérité de Animal)
+    }
+}

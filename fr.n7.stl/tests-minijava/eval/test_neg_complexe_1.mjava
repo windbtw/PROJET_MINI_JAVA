@@ -1,0 +1,18 @@
+class A {
+    public int m() { return 1; }
+}
+
+class B extends A {
+    public int mOnlyInB() { return 2; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A obj = new B();
+        
+        // obj a pour type statique A. Même s'il contient dynamiquement un objet B,
+        // le compilateur doit vérifier que la méthode existe dans le type statique A.
+        // Cela doit déclencher une erreur "Method mOnlyInB not found in class A".
+        print obj.mOnlyInB();
+    }
+}

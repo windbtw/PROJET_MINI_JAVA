@@ -1,0 +1,11 @@
+class A { }
+
+class B { }
+
+public class Main {
+    public static void main(String[] args) {
+        // Erreur de typage : B n'hérite pas de A
+        // Le compilateur doit empêcher cette assignation
+        A obj = new B();
+    }
+}

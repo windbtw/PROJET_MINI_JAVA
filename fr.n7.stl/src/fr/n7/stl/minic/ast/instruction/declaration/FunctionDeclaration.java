@@ -158,7 +158,7 @@ public class FunctionDeclaration implements DeclarationInstruction {
 			_param.offset = _paramOffset;
 			_paramOffset += _param.getType().length();
 		}
-		this.body.allocateMemory(Register.LB, 0);
+		this.body.allocateMemory(Register.LB, 3);
 		return 0;
 	}
 
