@@ -1,0 +1,59 @@
+PUSH 1
+LOADL 1
+SUBR MAlloc
+STORE (1) 0[SB]
+LOADA A_getPriv
+LOAD (1) 0[SB]
+LOADL 0
+SUBR IAdd
+STOREI (1)
+LOADL 4
+SUBR MAlloc
+LOAD (1) 0[SB]
+LOAD (1) -2[ST]
+STOREI (1)
+LOAD (1) -1[ST]
+CALL (SB) A_init_0
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5ecddf8f
+LOAD (1) 1[SB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@3f102e87
+LOAD (1) 1[SB]
+LOADL 0
+LOAD (1) -2[ST]
+LOADI (1)
+LOADL 0
+SUBR IAdd
+LOADI (1)
+CALLI
+SUBR IOut
+HALT
+A_init_0
+LOADL 1
+LOAD (1) -1[LB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+LOADL 2
+LOAD (1) -1[LB]
+LOADL 2
+SUBR IAdd
+STOREI (1)
+LOADL 3
+LOAD (1) -1[LB]
+LOADL 3
+SUBR IAdd
+STOREI (1)
+RETURN (0) 1
+A_getPriv
+LOAD (1) -1[LB]
+LOADL 2
+SUBR IAdd
+LOADI (1)
+RETURN (1) 1
+RETURN (1) 1
+HALT
+

@@ -2,12 +2,12 @@ PUSH 3
 LOADL 2
 SUBR MAlloc
 STORE (1) 0[SB]
-LOADA Animal_getAge
+LOADA Shape_getSize
 LOAD (1) 0[SB]
 LOADL 0
 SUBR IAdd
 STOREI (1)
-LOADA Animal_speak
+LOADA Shape_compute
 LOAD (1) 0[SB]
 LOADL 1
 SUBR IAdd
@@ -15,12 +15,12 @@ STOREI (1)
 LOADL 2
 SUBR MAlloc
 STORE (1) 1[SB]
-LOADA Animal_getAge
+LOADA Shape_getSize
 LOAD (1) 1[SB]
 LOADL 0
 SUBR IAdd
 STOREI (1)
-LOADA Dog_speak
+LOADA Rectangle_compute
 LOAD (1) 1[SB]
 LOADL 1
 SUBR IAdd
@@ -28,12 +28,12 @@ STOREI (1)
 LOADL 2
 SUBR MAlloc
 STORE (1) 2[SB]
-LOADA Animal_getAge
+LOADA Shape_getSize
 LOAD (1) 2[SB]
 LOADL 0
 SUBR IAdd
 STOREI (1)
-LOADA Puppy_speak
+LOADA Square_compute
 LOAD (1) 2[SB]
 LOADL 1
 SUBR IAdd
@@ -45,7 +45,7 @@ LOAD (1) -2[ST]
 STOREI (1)
 LOAD (1) -1[ST]
 LOADL 10
-CALL (SB) Animal_init_1
+CALL (SB) Shape_init_1
 LOADL 3
 SUBR MAlloc
 LOAD (1) 1[SB]
@@ -54,7 +54,7 @@ STOREI (1)
 LOAD (1) -1[ST]
 LOADL 5
 LOADL 8
-CALL (SB) Dog_init_2
+CALL (SB) Rectangle_init_2
 LOADL 3
 SUBR MAlloc
 LOAD (1) 2[SB]
@@ -62,8 +62,8 @@ LOAD (1) -2[ST]
 STOREI (1)
 LOAD (1) -1[ST]
 LOADL 1
-CALL (SB) Puppy_init_1
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@27082746
+CALL (SB) Square_init_1
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@7d4793a8
 LOAD (1) 3[SB]
 LOADL 0
 LOAD (1) -2[ST]
@@ -73,7 +73,7 @@ SUBR IAdd
 LOADI (1)
 CALLI
 SUBR IOut
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@66133adc
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@449b2d27
 LOAD (1) 4[SB]
 LOADL 0
 LOAD (1) -2[ST]
@@ -83,7 +83,7 @@ SUBR IAdd
 LOADI (1)
 CALLI
 SUBR IOut
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@7bfcd12c
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@5479e3f
 LOAD (1) 5[SB]
 LOADL 0
 LOAD (1) -2[ST]
@@ -93,7 +93,7 @@ SUBR IAdd
 LOADI (1)
 CALLI
 SUBR IOut
-;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@42f30e0a
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@27082746
 LOAD (1) 5[SB]
 LOADL 0
 LOAD (1) -2[ST]
@@ -104,55 +104,55 @@ LOADI (1)
 CALLI
 SUBR IOut
 HALT
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@24273305
-Animal_init_1
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@66133adc
+Shape_init_1
 LOAD (1) -1[LB]
 LOAD (1) -2[LB]
 LOADL 1
 SUBR IAdd
 STOREI (1)
 RETURN (0) 2
-Animal_getAge
+Shape_getSize
 LOAD (1) -1[LB]
 LOADL 1
 SUBR IAdd
 LOADI (1)
 RETURN (1) 1
 RETURN (1) 1
-Animal_speak
+Shape_compute
 LOADL 0
 RETURN (1) 1
 RETURN (1) 1
-Dog_init_2
+Rectangle_init_2
 LOAD (1) -3[LB]
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@5b1d2887
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@7bfcd12c
 LOAD (1) -2[LB]
-CALL (SB) Animal_init_1
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@46f5f779
+CALL (SB) Shape_init_1
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@42f30e0a
 LOAD (1) -1[LB]
 LOAD (1) -3[LB]
 LOADL 2
 SUBR IAdd
 STOREI (1)
 RETURN (0) 3
-Dog_speak
+Rectangle_compute
 LOAD (1) -1[LB]
 LOADL 2
 SUBR IAdd
 LOADI (1)
 RETURN (1) 1
 RETURN (1) 1
-Puppy_init_1
+Square_init_1
 LOAD (1) -2[LB]
-;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@1c2c22f3
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@24273305
 LOAD (1) -1[LB]
 LOADL 1
-CALL (SB) Dog_init_2
+CALL (SB) Rectangle_init_2
 RETURN (0) 2
-;(super.speak( ) + 1)
-Puppy_speak
+;(super.compute( ) + 1)
+Square_compute
 LOAD (1) -1[LB]
-CALL (SB) Dog_speak
+CALL (SB) Rectangle_compute
 LOADL 1
 SUBR IAdd
 RETURN (1) 1

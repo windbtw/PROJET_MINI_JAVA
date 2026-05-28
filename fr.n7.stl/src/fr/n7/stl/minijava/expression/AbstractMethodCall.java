@@ -9,6 +9,7 @@ import fr.n7.stl.minic.ast.scope.Declaration;
 import fr.n7.stl.minic.ast.scope.HierarchicalScope;
 import fr.n7.stl.minic.ast.type.Type;
 import fr.n7.stl.minijava.ast.type.ClassType;
+import fr.n7.stl.minijava.ast.type.declaration.AccessRight;
 import fr.n7.stl.minijava.ast.type.declaration.ClassDeclaration;
 import fr.n7.stl.minijava.ast.type.declaration.MethodDeclaration;
 import fr.n7.stl.util.Logger;
@@ -90,6 +91,14 @@ public abstract class AbstractMethodCall<ObjectKind extends Expression> implemen
 					Logger.error("Method " + this.name + " of class " + cd.getName() + " is not static.");
 					return false;
 				}
+				if (md.getParameters().size() != this.arguments.size()) {
+					Logger.error("Method " + this.name + " expects " + md.getParameters().size()
+							+ " argument(s), got " + this.arguments.size() + ".");
+					return false;
+				}
+				if (!isAccessible(md)) {
+					return false;
+				}
 				this.declaration = md;
 				this.staticCall = true;
 				return true;
@@ -117,7 +126,44 @@ public abstract class AbstractMethodCall<ObjectKind extends Expression> implemen
 			Logger.error("Method " + this.name + " not found in class " + cd.getName());
 			return false;
 		}
-		this.declaration = (MethodDeclaration) d;
+		MethodDeclaration md = (MethodDeclaration) d;
+		if (md.getParameters().size() != this.arguments.size()) {
+			Logger.error("Method " + this.name + " expects " + md.getParameters().size()
+					+ " argument(s), got " + this.arguments.size() + ".");
+			return false;
+		}
+		if (!isAccessible(md)) {
+			return false;
+		}
+		this.declaration = md;
+		return true;
+	}
+
+	private boolean isAccessible(MethodDeclaration md) {
+		AccessRight ar = md.getAccessRight();
+		if (ar == AccessRight.PUBLIC || ar == AccessRight.PACKAGE) {
+			return true;
+		}
+		ClassDeclaration current = ClassDeclaration.currentResolveContext();
+		ClassDeclaration owner = md.getOwner();
+		if (current == null || owner == null) {
+			Logger.error("Method " + md.getName() + " is " + ar + " in class "
+					+ (owner != null ? owner.getName() : "?") + " and cannot be called here.");
+			return false;
+		}
+		if (ar == AccessRight.PRIVATE) {
+			if (current != owner) {
+				Logger.error("Method " + md.getName() + " is private in class " + owner.getName()
+						+ " and cannot be called from class " + current.getName() + ".");
+				return false;
+			}
+			return true;
+		}
+		if (!current.isSubclassOf(owner)) {
+			Logger.error("Method " + md.getName() + " is protected in class " + owner.getName()
+					+ " and cannot be called from class " + current.getName() + ".");
+			return false;
+		}
 		return true;
 	}
 

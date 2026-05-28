@@ -5,6 +5,7 @@ import fr.n7.stl.minic.ast.scope.Declaration;
 import fr.n7.stl.minic.ast.scope.HierarchicalScope;
 import fr.n7.stl.minic.ast.type.Type;
 import fr.n7.stl.minijava.ast.type.ClassType;
+import fr.n7.stl.minijava.ast.type.declaration.AccessRight;
 import fr.n7.stl.minijava.ast.type.declaration.AttributeDeclaration;
 import fr.n7.stl.minijava.ast.type.declaration.ClassDeclaration;
 import fr.n7.stl.util.Logger;
@@ -65,6 +66,9 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 					Logger.error("Attribute " + this.name + " of class " + cd.getName() + " is not static.");
 					return false;
 				}
+				if (!isAccessible(ad)) {
+					return false;
+				}
 				this.attribute = ad;
 				this.staticAccess = true;
 				return true;
@@ -88,7 +92,40 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 			Logger.error("Attribute " + this.name + " not found in class " + cd.getName());
 			return false;
 		}
-		this.attribute = (AttributeDeclaration) d;
+		AttributeDeclaration ad = (AttributeDeclaration) d;
+		if (!isAccessible(ad)) {
+			return false;
+		}
+		this.attribute = ad;
+		return true;
+	}
+
+	private boolean isAccessible(AttributeDeclaration ad) {
+		AccessRight ar = ad.getAccessRight();
+		if (ar == AccessRight.PUBLIC || ar == AccessRight.PACKAGE) {
+			return true;
+		}
+		ClassDeclaration current = ClassDeclaration.currentResolveContext();
+		ClassDeclaration owner = ad.getOwner();
+		if (current == null || owner == null) {
+			Logger.error("Attribute " + ad.getName() + " is " + ar + " in class "
+					+ (owner != null ? owner.getName() : "?") + " and cannot be accessed here.");
+			return false;
+		}
+		if (ar == AccessRight.PRIVATE) {
+			if (current != owner) {
+				Logger.error("Attribute " + ad.getName() + " is private in class " + owner.getName()
+						+ " and cannot be accessed from class " + current.getName() + ".");
+				return false;
+			}
+			return true;
+		}
+		// PROTECTED: current must be owner or a subclass of owner.
+		if (!current.isSubclassOf(owner)) {
+			Logger.error("Attribute " + ad.getName() + " is protected in class " + owner.getName()
+					+ " and cannot be accessed from class " + current.getName() + ".");
+			return false;
+		}
 		return true;
 	}
 

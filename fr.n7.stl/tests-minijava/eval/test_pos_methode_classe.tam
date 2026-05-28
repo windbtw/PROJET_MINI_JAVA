@@ -1,0 +1,15 @@
+PUSH 1
+LOADL 0
+SUBR MAlloc
+STORE (1) 0[SB]
+LOADL 99
+CALL (SB) A_static_identity
+SUBR IOut
+HALT
+;fr.n7.stl.minic.ast.expression.accessible.ParameterAccess@3a4afd8d
+A_static_identity
+LOAD (1) -1[LB]
+RETURN (1) 1
+RETURN (1) 1
+HALT
+

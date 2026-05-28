@@ -13,6 +13,8 @@ public class AttributeDeclaration extends ClassElement {
 
 	protected AccessibleExpression initializer;
 
+	protected ClassDeclaration owner;
+
 	public AttributeDeclaration(String _name, Type _type) {
 		super(_name);
 		this.type = _type;
@@ -49,6 +51,14 @@ public class AttributeDeclaration extends ClassElement {
 
 	public AccessibleExpression getInitializer() {
 		return this.initializer;
+	}
+
+	public ClassDeclaration getOwner() {
+		return this.owner;
+	}
+
+	public void setOwner(ClassDeclaration _owner) {
+		this.owner = _owner;
 	}
 
 	public boolean isStatic() {

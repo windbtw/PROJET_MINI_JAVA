@@ -1,6 +1,8 @@
 package fr.n7.stl.minijava.ast.type.declaration;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,14 @@ import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 
 public class ClassDeclaration implements Instruction, Declaration {
+
+	/** Stack of classes whose bodies are currently being resolved, used by member-access
+	 *  nodes to enforce private / protected visibility. Empty when resolving from main. */
+	private static final Deque<ClassDeclaration> RESOLVE_CONTEXT = new ArrayDeque<>();
+
+	public static ClassDeclaration currentResolveContext() {
+		return RESOLVE_CONTEXT.peek();
+	}
 
 	protected List<ClassElement> elements;
 
@@ -126,8 +136,10 @@ public class ClassDeclaration implements Instruction, Declaration {
 		boolean ok = true;
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
-				if (this.members.accepts(e)) {
-					this.members.register(e);
+				AttributeDeclaration a = (AttributeDeclaration) e;
+				a.setOwner(this);
+				if (this.members.accepts(a)) {
+					this.members.register(a);
 				} else {
 					System.err.println("Attribute " + e.getName() + " duplicated in class " + this.name + ".");
 					ok = false;
@@ -168,6 +180,15 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	@Override
 	public boolean completeResolve(HierarchicalScope<Declaration> _scope) {
+		RESOLVE_CONTEXT.push(this);
+		try {
+			return doCompleteResolve(_scope);
+		} finally {
+			RESOLVE_CONTEXT.pop();
+		}
+	}
+
+	private boolean doCompleteResolve(HierarchicalScope<Declaration> _scope) {
 		boolean ok = true;
 		if (this.ancestor != null) {
 			Declaration d = _scope.get(this.ancestor);
