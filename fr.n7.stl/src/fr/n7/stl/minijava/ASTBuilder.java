@@ -136,21 +136,27 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
                         c.setVmtPointerOffset(vmtCurrentOffset);
                         vmtCurrentOffset += 1;
                     }
-                    this.main.allocateMemory(Register.SB, vmtCurrentOffset);
+                    int staticBase = vmtCurrentOffset;
+                    int staticTotal = 0;
+                    for (ClassDeclaration c : this.classes) {
+                        staticTotal += c.allocateStaticMemory(staticBase + staticTotal);
+                    }
+                    int globalBase = staticBase + staticTotal;
+                    this.main.allocateMemory(Register.SB, globalBase);
 
                     TAMFactory factory = new TAMFactoryImpl();
                     Fragment f = factory.createFragment();
-                    
-                    // Generate VMT initialization
-                    if (vmtCurrentOffset > 0) {
-                        f.add(factory.createPush(vmtCurrentOffset));
+
+                    // Reserve SB slots for VMT pointers + static attributes in one push.
+                    if (globalBase > 0) {
+                        f.add(factory.createPush(globalBase));
                     }
                     for (ClassDeclaration c : this.classes) {
                         List<MethodDeclaration> vmt = c.getVmt();
                         f.add(factory.createLoadL(vmt.size()));
                         f.add(Library.MAlloc);
                         f.add(factory.createStore(Register.SB, c.getVmtPointerOffset(), 1));
-                        
+
                         for (int i = 0; i < vmt.size(); i++) {
                             MethodDeclaration m = vmt.get(i);
                             f.add(factory.createLoadA(m.getFunction().getName()));
@@ -159,6 +165,11 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
                             f.add(Library.IAdd);
                             f.add(factory.createStoreI(1));
                         }
+                    }
+
+                    // Static attribute initializers run before main body.
+                    for (ClassDeclaration c : this.classes) {
+                        f.append(c.getStaticInitCode(factory));
                     }
 
                     // Main code first (entry point), then class method bodies (reached by CALL).
@@ -302,7 +313,7 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
 
 	@Override
 	public void exitAttributClasse(AttributClasseContext ctx) {
-		ctx.unAttribut = new AttributeDeclaration( ctx.leNom.getText(), ctx.leType.unType);
+		ctx.unAttribut = new AttributeDeclaration( ctx.leNom.getText(), ctx.leType.unType, ctx.laValeur.uneExpression);
 		ctx.unAttribut.setElementKind(ElementKind.CLASS);
 	}
 
@@ -402,7 +413,11 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
     
     @Override
     public void exitInstructionAppelMethodeExplicite(InstructionAppelMethodeExpliciteContext ctx) {
-        ctx.uneInstruction = new MethodCall(ctx.lObjet.uneExpression, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        MethodCall mc = new MethodCall(ctx.lObjet.uneExpression, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        if (ctx.lObjet instanceof LectureIdentificateurContext) {
+            mc.setReceiverIdentifier(((LectureIdentificateurContext) ctx.lObjet).leNom.getText());
+        }
+        ctx.uneInstruction = mc;
     }
     
     @Override
@@ -484,7 +499,11 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
 
     @Override
     public void exitEcritureAttribut(EcritureAttributContext ctx) {
-        ctx.uneExpressionAffectable = new AttributeAssignment(ctx.lObjet.uneExpressionAffectable, ctx.leNom.getText());
+        AttributeAssignment aa = new AttributeAssignment(ctx.lObjet.uneExpressionAffectable, ctx.leNom.getText());
+        if (ctx.lObjet instanceof EcritureIdentificateurContext) {
+            aa.setReceiverIdentifier(((EcritureIdentificateurContext) ctx.lObjet).lIdentificateur.getText());
+        }
+        ctx.uneExpressionAffectable = aa;
     }
 
     @Override
@@ -494,7 +513,11 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
     
     @Override
     public void exitEcritureAppelMethodeExplicite(EcritureAppelMethodeExpliciteContext ctx) {
-        ctx.uneExpressionAffectable = new MethodCallAssignment(ctx.lObjet.uneExpressionAffectable, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        MethodCallAssignment mca = new MethodCallAssignment(ctx.lObjet.uneExpressionAffectable, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        if (ctx.lObjet instanceof EcritureIdentificateurContext) {
+            mca.setReceiverIdentifier(((EcritureIdentificateurContext) ctx.lObjet).lIdentificateur.getText());
+        }
+        ctx.uneExpressionAffectable = mca;
     }
     
     @Override
@@ -677,12 +700,20 @@ public class ASTBuilder extends MiniJavaParserBaseListener {
     
     @Override
     public void exitLectureAttribut(LectureAttributContext ctx) {
-        ctx.uneExpression = new AttributeAccess(ctx.lObjet.uneExpression, ctx.leNom.getText());
+        AttributeAccess aa = new AttributeAccess(ctx.lObjet.uneExpression, ctx.leNom.getText());
+        if (ctx.lObjet instanceof LectureIdentificateurContext) {
+            aa.setReceiverIdentifier(((LectureIdentificateurContext) ctx.lObjet).leNom.getText());
+        }
+        ctx.uneExpression = aa;
     }
-    
+
     @Override
     public void exitLectureAppelMethodeExplicite(MiniJavaParser.LectureAppelMethodeExpliciteContext ctx) {
-        ctx.uneExpression = new MethodCallAccess(ctx.lobjet.uneExpression, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        MethodCallAccess mca = new MethodCallAccess(ctx.lobjet.uneExpression, ctx.leNom.getText(), ctx.lesArguments.desArguments);
+        if (ctx.lobjet instanceof LectureIdentificateurContext) {
+            mca.setReceiverIdentifier(((LectureIdentificateurContext) ctx.lobjet).leNom.getText());
+        }
+        ctx.uneExpression = mca;
     }
     
     @Override

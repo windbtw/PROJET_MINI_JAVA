@@ -1,7 +1,9 @@
 package fr.n7.stl.minijava.ast.type.declaration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.n7.stl.minic.ast.instruction.Instruction;
 import fr.n7.stl.minic.ast.instruction.declaration.FunctionDeclaration;
@@ -74,6 +76,10 @@ public class ClassDeclaration implements Instruction, Declaration {
 
 	public ClassDeclaration getParent() {
 		return this.parent;
+	}
+
+	public boolean isConcrete() {
+		return this.concrete;
 	}
 
 	/** Walks the class chain looking for an attribute or method by name. */
@@ -198,6 +204,28 @@ public class ClassDeclaration implements Instruction, Declaration {
 				ok &= ((ConstructorDeclaration) e).checkType();
 			}
 		}
+		if (this.concrete) {
+			// Walk most-derived to ancestor: first definition wins per name.
+			Map<String, MethodDeclaration> effective = new HashMap<>();
+			ClassDeclaration c = this;
+			while (c != null) {
+				for (ClassElement e : c.elements) {
+					if (e instanceof MethodDeclaration) {
+						MethodDeclaration m = (MethodDeclaration) e;
+						if (!effective.containsKey(m.getName())) {
+							effective.put(m.getName(), m);
+						}
+					}
+				}
+				c = c.parent;
+			}
+			for (MethodDeclaration m : effective.values()) {
+				if (!m.isConcrete()) {
+					System.err.println("Concrete class " + this.name + " must implement abstract method " + m.getName() + ".");
+					ok = false;
+				}
+			}
+		}
 		return ok;
 	}
 
@@ -218,10 +246,13 @@ public class ClassDeclaration implements Instruction, Declaration {
 			current = this.parent.getObjectSize();
 			this.vmt.addAll(this.parent.getVmt());
 		}
-		
+
 		for (ClassElement e : this.elements) {
 			if (e instanceof MethodDeclaration) {
 				MethodDeclaration m = (MethodDeclaration) e;
+				if (m.isStatic()) {
+					continue;
+				}
 				boolean overrides = false;
 				for (int i = 0; i < this.vmt.size(); i++) {
 					if (this.vmt.get(i).getName().equals(m.getName())) {
@@ -241,6 +272,9 @@ public class ClassDeclaration implements Instruction, Declaration {
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
 				AttributeDeclaration a = (AttributeDeclaration) e;
+				if (a.isStatic()) {
+					continue;
+				}
 				a.setOffset(current);
 				current += a.getLength();
 			}
@@ -254,6 +288,37 @@ public class ClassDeclaration implements Instruction, Declaration {
 			}
 		}
 		return 0;
+	}
+
+	/** Reserve SB-relative slots for this class' static attributes starting at {@code base}.
+	 *  Returns the total number of words consumed. */
+	public int allocateStaticMemory(int base) {
+		int consumed = 0;
+		for (ClassElement e : this.elements) {
+			if (e instanceof AttributeDeclaration) {
+				AttributeDeclaration a = (AttributeDeclaration) e;
+				if (a.isStatic()) {
+					a.setStaticOffset(base + consumed);
+					consumed += a.getLength();
+				}
+			}
+		}
+		return consumed;
+	}
+
+	/** Emit initialization code for this class' static attributes (evaluated then stored). */
+	public Fragment getStaticInitCode(TAMFactory _factory) {
+		Fragment result = _factory.createFragment();
+		for (ClassElement e : this.elements) {
+			if (e instanceof AttributeDeclaration) {
+				AttributeDeclaration a = (AttributeDeclaration) e;
+				if (a.isStatic() && a.getInitializer() != null) {
+					result.append(a.getInitializer().getCode(_factory));
+					result.add(_factory.createStore(Register.SB, a.getStaticOffset(), a.getLength()));
+				}
+			}
+		}
+		return result;
 	}
 
 	@Override

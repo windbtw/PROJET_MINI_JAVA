@@ -22,12 +22,19 @@ public class MethodCallAccess extends AbstractMethodCall<AccessibleExpression> i
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
+		if (this.staticCall) {
+			for (AccessibleExpression a : this.arguments) {
+				result.append(a.getCode(_factory));
+			}
+			result.add(_factory.createCall(this.declaration.getFunction().getName(), Register.SB));
+			return result;
+		}
 		// Push `this`, then user args.
 		result.append(this.target.getCode(_factory));
 		for (AccessibleExpression a : this.arguments) {
 			result.append(a.getCode(_factory));
 		}
-		
+
 		if (this.target instanceof SuperAccess) {
 			result.add(_factory.createCall(this.declaration.getFunction().getName(), Register.SB));
 		} else {
@@ -43,7 +50,7 @@ public class MethodCallAccess extends AbstractMethodCall<AccessibleExpression> i
 			result.add(_factory.createLoadI(1));
 			result.add(_factory.createCallI());
 		}
-		
+
 		return result;
 	}
 

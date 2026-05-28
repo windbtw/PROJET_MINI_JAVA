@@ -57,6 +57,10 @@ public class ObjectAllocation implements AccessibleExpression, AssignableExpress
 			Logger.error("Cannot allocate unknown class " + this.name);
 			return false;
 		}
+		if (!cd.isConcrete()) {
+			Logger.error("Cannot instantiate abstract class " + this.name + ".");
+			return false;
+		}
 		this.constructor = cd.findConstructor(this.arguments.size());
 		if (this.constructor == null && this.arguments.size() > 0) {
 			Logger.error("No constructor in " + this.name + " matches " + this.arguments.size() + " argument(s).");

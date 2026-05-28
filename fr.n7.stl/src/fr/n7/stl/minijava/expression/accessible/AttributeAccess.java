@@ -4,6 +4,7 @@ import fr.n7.stl.minic.ast.expression.accessible.AccessibleExpression;
 import fr.n7.stl.minijava.expression.AbstractAttribute;
 import fr.n7.stl.tam.ast.Fragment;
 import fr.n7.stl.tam.ast.Library;
+import fr.n7.stl.tam.ast.Register;
 import fr.n7.stl.tam.ast.TAMFactory;
 
 public class AttributeAccess extends AbstractAttribute<AccessibleExpression> implements AccessibleExpression {
@@ -14,6 +15,11 @@ public class AttributeAccess extends AbstractAttribute<AccessibleExpression> imp
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
+		if (this.staticAccess) {
+			Fragment result = _factory.createFragment();
+			result.add(_factory.createLoad(Register.SB, this.attribute.getStaticOffset(), this.attribute.getType().length()));
+			return result;
+		}
 		Fragment result = this.object.getCode(_factory);
 		result.add(_factory.createLoadL(this.attribute.getOffset()));
 		result.add(Library.IAdd);

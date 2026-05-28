@@ -6,6 +6,7 @@ import java.util.List;
 
 import fr.n7.stl.minic.ast.Block;
 import fr.n7.stl.minic.ast.instruction.Instruction;
+import fr.n7.stl.minic.ast.instruction.Instruction;
 import fr.n7.stl.minic.ast.instruction.declaration.FunctionDeclaration;
 import fr.n7.stl.minic.ast.instruction.declaration.ParameterDeclaration;
 import fr.n7.stl.minic.ast.scope.Declaration;
@@ -70,6 +71,10 @@ public class MethodDeclaration extends ClassElement implements Instruction {
 		return this.parameters;
 	}
 
+	public boolean isConcrete() {
+		return this.concrete;
+	}
+
 	@Override
 	public Type getType() {
 		return this.type;
@@ -79,15 +84,28 @@ public class MethodDeclaration extends ClassElement implements Instruction {
 	 * Build the synthetic FunctionDeclaration. Must be called after owner is set
 	 * and before delegating semantics.
 	 */
+	public boolean isStatic() {
+		return this.elementKind == ElementKind.CLASS;
+	}
+
 	protected void buildFunction() {
 		if (this.function != null) {
 			return;
 		}
 		List<ParameterDeclaration> allParams = new LinkedList<>();
-		allParams.add(new ParameterDeclaration("this", new ClassType(this.owner.getName())));
-		allParams.addAll(this.parameters);
-		String label = this.owner.getName() + "_" + this.name;
-		this.function = new FunctionDeclaration(label, this.type, allParams, this.body);
+		String label;
+		if (this.isStatic()) {
+			allParams.addAll(this.parameters);
+			label = this.owner.getName() + "_static_" + this.name;
+		} else {
+			allParams.add(new ParameterDeclaration("this", new ClassType(this.owner.getName())));
+			allParams.addAll(this.parameters);
+			label = this.owner.getName() + "_" + this.name;
+		}
+		// Abstract methods have no body. Build with an empty block so the function still
+		// has a label (needed for VMT slot placeholders) and downstream semantics never NPE.
+		Block effectiveBody = (this.body != null) ? this.body : new Block(new LinkedList<Instruction>());
+		this.function = new FunctionDeclaration(label, this.type, allParams, effectiveBody);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package fr.n7.stl.minijava.ast.type.declaration;
 
+import fr.n7.stl.minic.ast.expression.accessible.AccessibleExpression;
 import fr.n7.stl.minic.ast.type.Type;
 
 public class AttributeDeclaration extends ClassElement {
@@ -8,10 +9,21 @@ public class AttributeDeclaration extends ClassElement {
 
 	protected int offset;
 
+	protected int staticOffset;
+
+	protected AccessibleExpression initializer;
+
 	public AttributeDeclaration(String _name, Type _type) {
 		super(_name);
 		this.type = _type;
 		this.offset = 0;
+		this.staticOffset = -1;
+		this.initializer = null;
+	}
+
+	public AttributeDeclaration(String _name, Type _type, AccessibleExpression _initializer) {
+		this(_name, _type);
+		this.initializer = _initializer;
 	}
 
 	@Override
@@ -27,12 +39,30 @@ public class AttributeDeclaration extends ClassElement {
 		this.offset = _offset;
 	}
 
+	public int getStaticOffset() {
+		return this.staticOffset;
+	}
+
+	public void setStaticOffset(int _offset) {
+		this.staticOffset = _offset;
+	}
+
+	public AccessibleExpression getInitializer() {
+		return this.initializer;
+	}
+
+	public boolean isStatic() {
+		return this.elementKind == ElementKind.CLASS;
+	}
+
 	public int getLength() {
 		return this.type.length();
 	}
 
 	@Override
 	public String toString() {
-		return this.accessRight + " " + type + " " + this.name + ";\n";
+		String prefix = (this.isStatic() ? "static " : "");
+		String suffix = (this.initializer != null ? " = " + this.initializer : "");
+		return this.accessRight + " " + prefix + type + " " + this.name + suffix + ";\n";
 	}
 }

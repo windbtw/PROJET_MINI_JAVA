@@ -15,9 +15,28 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 	protected String name;
 	protected AttributeDeclaration attribute;
 
+	/** Set when the receiver was syntactically a bare identifier; lets completeResolve try
+	 *  class-name lookup first to detect static attribute access (e.g. {@code A.x}). */
+	protected String receiverIdentifier;
+
+	/** True when this access targets a static attribute resolved via a class name. */
+	protected boolean staticAccess;
+
 	public AbstractAttribute(ObjectKind _object, String _name) {
 		this.object = _object;
 		this.name = _name;
+	}
+
+	public void setReceiverIdentifier(String _name) {
+		this.receiverIdentifier = _name;
+	}
+
+	public AttributeDeclaration getAttribute() {
+		return this.attribute;
+	}
+
+	public boolean isStaticAccess() {
+		return this.staticAccess;
 	}
 
 	@Override
@@ -27,6 +46,26 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 
 	@Override
 	public boolean completeResolve(HierarchicalScope<Declaration> _scope) {
+		// Detect static access via a bare class identifier: A.x
+		if (this.receiverIdentifier != null && _scope.knows(this.receiverIdentifier)) {
+			Declaration rd = _scope.get(this.receiverIdentifier);
+			if (rd instanceof ClassDeclaration) {
+				ClassDeclaration cd = (ClassDeclaration) rd;
+				Declaration d = cd.lookupMember(this.name);
+				if (!(d instanceof AttributeDeclaration)) {
+					Logger.error("Attribute " + this.name + " not found in class " + cd.getName());
+					return false;
+				}
+				AttributeDeclaration ad = (AttributeDeclaration) d;
+				if (!ad.isStatic()) {
+					Logger.error("Attribute " + this.name + " of class " + cd.getName() + " is not static.");
+					return false;
+				}
+				this.attribute = ad;
+				this.staticAccess = true;
+				return true;
+			}
+		}
 		if (!this.object.completeResolve(_scope)) {
 			return false;
 		}

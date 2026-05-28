@@ -29,6 +29,10 @@ public class MethodCall implements Instruction {
 
 	protected List<AccessibleExpression> arguments;
 
+	protected String receiverIdentifier;
+
+	protected boolean staticCall;
+
 	public MethodCall(AccessibleExpression _target, String _name, List<AccessibleExpression> _arguments) {
 		this.name = _name;
 		this.method = null;
@@ -38,6 +42,10 @@ public class MethodCall implements Instruction {
 
 	public MethodCall(String _name, List<AccessibleExpression> _arguments) {
 		this(null, _name, _arguments);
+	}
+
+	public void setReceiverIdentifier(String _name) {
+		this.receiverIdentifier = _name;
 	}
 
 	@Override
@@ -62,6 +70,32 @@ public class MethodCall implements Instruction {
 		if (this.target == null) {
 			Logger.error("Implicit method calls (without target) are not supported yet.");
 			return false;
+		}
+		if (this.receiverIdentifier != null && _scope.knows(this.receiverIdentifier)) {
+			Declaration rd = _scope.get(this.receiverIdentifier);
+			if (rd instanceof ClassDeclaration) {
+				ClassDeclaration cd = (ClassDeclaration) rd;
+				boolean ok = true;
+				for (AccessibleExpression a : this.arguments) {
+					ok &= a.completeResolve(_scope);
+				}
+				if (!ok) {
+					return false;
+				}
+				Declaration d = cd.lookupMember(this.name);
+				if (!(d instanceof MethodDeclaration)) {
+					Logger.error("Method " + this.name + " not found in class " + cd.getName());
+					return false;
+				}
+				MethodDeclaration md = (MethodDeclaration) d;
+				if (!md.isStatic()) {
+					Logger.error("Method " + this.name + " of class " + cd.getName() + " is not static.");
+					return false;
+				}
+				this.method = md;
+				this.staticCall = true;
+				return true;
+			}
 		}
 		boolean ok = this.target.completeResolve(_scope);
 		for (AccessibleExpression a : this.arguments) {
@@ -102,11 +136,22 @@ public class MethodCall implements Instruction {
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
+		if (this.staticCall) {
+			for (AccessibleExpression a : this.arguments) {
+				result.append(a.getCode(_factory));
+			}
+			result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
+			int returnSize = this.method.getType().length();
+			if (returnSize > 0) {
+				result.add(_factory.createPop(0, returnSize));
+			}
+			return result;
+		}
 		result.append(this.target.getCode(_factory));
 		for (AccessibleExpression a : this.arguments) {
 			result.append(a.getCode(_factory));
 		}
-		
+
 		if (this.target instanceof SuperAccess) {
 			result.add(_factory.createCall(this.method.getFunction().getName(), Register.SB));
 		} else {

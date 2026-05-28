@@ -18,6 +18,10 @@ public class AttributeAssignment extends AbstractAttribute<AssignableExpression>
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
 		Fragment result = _factory.createFragment();
+		if (this.staticAccess) {
+			result.add(_factory.createStore(Register.SB, this.attribute.getStaticOffset(), this.attribute.getType().length()));
+			return result;
+		}
 		// Push the object reference (the address holding the attribute).
 		if (this.object instanceof VariableAssignment) {
 			VariableDeclaration vd = ((VariableAssignment) this.object).getDeclaration();

@@ -1,10 +1,4 @@
 class A {
-    public int x;
-
-    public A() {
-        this.x = 7;
-    }
-
     public static int identity(int v) {
         return v;
     }
@@ -12,7 +6,6 @@ class A {
 
 public class Main {
     public static void main(String[] args) {
-        A a = new A();
-        print a.x;
+        print A.identity(99);
     }
 }
