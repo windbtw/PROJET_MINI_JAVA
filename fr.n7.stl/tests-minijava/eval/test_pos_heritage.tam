@@ -1,0 +1,26 @@
+PUSH 2
+LOADL 0
+SUBR MAlloc
+STORE (1) 0[SB]
+LOADL 0
+SUBR MAlloc
+STORE (1) 1[SB]
+LOADL 2
+SUBR MAlloc
+LOAD (1) 1[SB]
+LOAD (1) -2[ST]
+STOREI (1)
+LOADL 42
+LOAD (1) 2[SB]
+LOADL 1
+SUBR IAdd
+STOREI (1)
+;fr.n7.stl.minic.ast.expression.accessible.VariableAccess@1f89ab83
+LOAD (1) 2[SB]
+LOADL 1
+SUBR IAdd
+LOADI (1)
+SUBR IOut
+HALT
+HALT
+

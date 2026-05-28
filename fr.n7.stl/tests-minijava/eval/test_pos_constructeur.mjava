@@ -1,0 +1,13 @@
+class A {
+    public int x;
+    public A(int v) {
+        this.x = v;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new A(100);
+        print a.x;
+    }
+}
