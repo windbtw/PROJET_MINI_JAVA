@@ -1,7 +1,6 @@
 class A {
     public int compute() {
         boolean x = true;
-        // Erreur : on essaie de retourner un booléen alors que la signature exige un int
         return x;
     }
 }

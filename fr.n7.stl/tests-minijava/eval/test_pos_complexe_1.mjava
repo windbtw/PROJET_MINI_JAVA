@@ -1,53 +1,51 @@
-class Animal {
-    public int age;
+class Shape {
+    public int size;
     
-    public Animal(int a) { 
-        this.age = a; 
+    public Shape(int s) { 
+        this.size = s; 
     }
     
-    public int getAge() { 
-        return this.age; 
+    public int getSize() { 
+        return this.size; 
     }
     
-    public int speak() { 
+    public int compute() { 
         return 0; 
     }
 }
 
-class Dog extends Animal {
-    public int barkVolume;
+class Rectangle extends Shape {
+    public int width;
     
-    public Dog(int a, int v) { 
-        super(a); 
-        this.barkVolume = v; 
+    public Rectangle(int s, int w) { 
+        super(s); 
+        this.width = w; 
     }
     
-    public int speak() { 
-        return this.barkVolume; 
+    public int compute() { 
+        return this.width; 
     }
 }
 
-class Puppy extends Dog {
-    public Puppy(int a) { 
-        super(a, 1); 
+class Square extends Rectangle {
+    public Square(int s) { 
+        super(s, 1); 
     }
     
-    // Le chiot aboie un peu plus fort que son volume de base
-    public int speak() { 
-        return (super.speak() + 1); 
+    public int compute() { 
+        return (super.compute() + 1); 
     }
 }
 
 public class Main {
     public static void main(String[] args) {
-        // Polymorphisme : des variables de type Animal contiennent différents sous-types
-        Animal a1 = new Animal(10);
-        Animal a2 = new Dog(5, 8);
-        Animal a3 = new Puppy(1);
+        Shape s1 = new Shape(10);
+        Shape s2 = new Rectangle(5, 8);
+        Shape s3 = new Square(1);
         
-        print a1.speak(); // Doit afficher 0
-        print a2.speak(); // Doit afficher 8
-        print a3.speak(); // Doit afficher 2
-        print a3.getAge(); // Doit afficher 1 (hérité de Animal)
+        print s1.compute();
+        print s2.compute();
+        print s3.compute();
+        print s3.getSize();
     }
 }

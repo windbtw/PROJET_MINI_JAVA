@@ -4,8 +4,6 @@ class A {
 
 class B extends A {
     public B() {
-        // Erreur : on appelle le constructeur parent sans argument, 
-        // alors que A(int x) en demande un.
         super();
     }
 }
