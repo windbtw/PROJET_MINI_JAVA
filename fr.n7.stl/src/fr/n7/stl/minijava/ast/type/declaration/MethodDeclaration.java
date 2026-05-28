@@ -136,6 +136,14 @@ public class MethodDeclaration extends ClassElement implements Instruction {
 
 	@Override
 	public Fragment getCode(TAMFactory _factory) {
+		if (!this.concrete) {
+			// Abstract method: emit a labelled trap that halts if ever reached.
+			// Under our check, no concrete class leaves it unimplemented, so this is unreachable.
+			Fragment trap = _factory.createFragment();
+			trap.add(_factory.createHalt());
+			trap.addPrefix(this.function.getName());
+			return trap;
+		}
 		return this.function.getCode(_factory);
 	}
 
@@ -145,7 +153,7 @@ public class MethodDeclaration extends ClassElement implements Instruction {
 		if (!this.concrete) {
 			image += "abstract ";
 		}
-		image += this.accessRight + " " + this.type + " " + this.name + "( ";
+		image += this.accessRight + " " + (this.isStatic() ? "static " : "") + this.type + " " + this.name + "( ";
 		Iterator<ParameterDeclaration> iterator = this.parameters.iterator();
 		if (iterator.hasNext()) {
 			ParameterDeclaration parameter = iterator.next();

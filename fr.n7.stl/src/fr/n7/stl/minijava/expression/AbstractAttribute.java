@@ -41,6 +41,10 @@ public abstract class AbstractAttribute<ObjectKind extends Expression> implement
 
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
+		if (this.receiverIdentifier != null && _scope.knows(this.receiverIdentifier)
+				&& _scope.get(this.receiverIdentifier) instanceof ClassDeclaration) {
+			return true;
+		}
 		return this.object.collectAndPartialResolve(_scope);
 	}
 

@@ -50,7 +50,10 @@ public abstract class AbstractMethodCall<ObjectKind extends Expression> implemen
 	@Override
 	public boolean collectAndPartialResolve(HierarchicalScope<Declaration> _scope) {
 		boolean ok = true;
-		if (this.target != null) {
+		boolean targetIsClass = this.receiverIdentifier != null
+				&& _scope.knows(this.receiverIdentifier)
+				&& _scope.get(this.receiverIdentifier) instanceof ClassDeclaration;
+		if (this.target != null && !targetIsClass) {
 			ok &= this.target.collectAndPartialResolve(_scope);
 		}
 		for (AccessibleExpression a : this.arguments) {

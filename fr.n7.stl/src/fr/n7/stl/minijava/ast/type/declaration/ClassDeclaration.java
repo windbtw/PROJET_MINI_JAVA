@@ -184,7 +184,12 @@ public class ClassDeclaration implements Instruction, Declaration {
 		}
 		for (ClassElement e : this.elements) {
 			if (e instanceof AttributeDeclaration) {
-				ok &= ((AttributeDeclaration) e).getType().completeResolve(_scope);
+				AttributeDeclaration ad = (AttributeDeclaration) e;
+				ok &= ad.getType().completeResolve(_scope);
+				if (ad.isStatic() && ad.getInitializer() != null) {
+					ok &= ad.getInitializer().collectAndPartialResolve(_scope);
+					ok &= ad.getInitializer().completeResolve(_scope);
+				}
 			} else if (e instanceof MethodDeclaration) {
 				ok &= ((MethodDeclaration) e).completeResolve(_scope);
 			} else if (e instanceof ConstructorDeclaration) {
